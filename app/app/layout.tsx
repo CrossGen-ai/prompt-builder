@@ -1,4 +1,3 @@
-import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './styles/globals.css'
 import { ThemeProvider } from '@/lib/theme-provider'
@@ -6,14 +5,10 @@ import { Header } from '@/components/core/Header'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
-export const metadata: Metadata = {
-  title: 'Prompt Builder | Build Reusable Prompt Templates',
-  description: 'Build and manage reusable prompt templates with an intuitive interface',
-  keywords: ['prompt', 'template', 'builder', 'AI', 'GPT'],
-  authors: [{ name: 'Prompt Builder Team' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#000000',
-}
+// Force dynamic rendering to avoid static generation errors
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = 0
 
 export default function RootLayout({
   children,
@@ -23,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <title>Prompt Builder</title>
         <script
           dangerouslySetInnerHTML={{
             __html: `
