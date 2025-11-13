@@ -5,11 +5,6 @@ import { Header } from '@/components/core/Header'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
-// Force dynamic rendering to avoid static generation errors
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
-export const revalidate = 0
-
 export default function RootLayout({
   children,
 }: {

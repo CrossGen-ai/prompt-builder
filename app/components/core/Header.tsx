@@ -5,7 +5,13 @@ import { SignInButton } from '@/components/auth/SignInButton';
 import { ThemeToggle } from '@/components/core/ThemeToggle';
 
 export async function Header() {
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch (error) {
+    // Handle auth errors during build/prerendering
+    console.log('Auth not available during build');
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-xl shadow-lg dark:shadow-blue-900/20 shadow-blue-100/50">
