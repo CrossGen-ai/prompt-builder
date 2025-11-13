@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { usePromptStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import { Category, PromptFragment } from '@/lib/types'
-import { Header } from '@/components/core/Header'
 import { CategoryList } from '@/components/core/CategoryList'
 import { PromptPreview } from '@/components/core/PromptPreview'
 import { CustomPromptInput } from '@/components/core/CustomPromptInput'
@@ -187,7 +186,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
-      <Header />
       <main className="container mx-auto px-3 py-6 sm:px-6 sm:py-8 lg:px-8">
         {error && (
           <div className="mb-6 flex items-center gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">

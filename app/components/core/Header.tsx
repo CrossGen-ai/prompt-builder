@@ -1,12 +1,11 @@
-'use client'
+import React from 'react';
+import { Sparkles } from 'lucide-react';
+import { auth } from '@/auth';
+import { SignInButton } from '@/components/auth/SignInButton';
+import { ThemeToggle } from '@/components/core/ThemeToggle';
 
-import React from 'react'
-import { Sparkles, Moon, Sun } from 'lucide-react'
-import { useTheme } from '@/lib/theme-provider'
-import { Button } from '@/components/ui/button'
-
-export function Header() {
-  const { theme, toggleTheme } = useTheme()
+export async function Header() {
+  const session = await auth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-xl shadow-lg dark:shadow-blue-900/20 shadow-blue-100/50">
@@ -28,21 +27,10 @@ export function Header() {
           <span className="hidden md:inline text-xs sm:text-sm text-muted-foreground bg-blue-50 dark:bg-blue-950/50 px-3 py-1 rounded-full">
             ✨ AI Powered
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="h-9 w-9 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/50"
-            aria-label="Toggle theme"
-          >
-            {theme === 'light' ? (
-              <Moon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            ) : (
-              <Sun className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            )}
-          </Button>
+          <ThemeToggle />
+          <SignInButton user={session?.user || null} />
         </div>
       </div>
     </header>
-  )
+  );
 }

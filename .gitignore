@@ -33,12 +33,24 @@ lerna-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local env files
+# Local env files - ALL variations
 .env
+.env.*
 .env*.local
+.env.local
 .env.development
+.env.development.local
 .env.test
+.env.test.local
 .env.production
+.env.production.local
+**/.env
+**/.env.*
+**/.env*.local
+
+# But allow .env.sample files (templates)
+!.env.sample
+!**/.env.sample
 
 # Vercel
 .vercel

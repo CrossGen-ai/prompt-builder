@@ -8,6 +8,13 @@
       "when": 1763060555468,
       "tag": "0000_redundant_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763061959621,
+      "tag": "0001_petite_frog_thor",
+      "breakpoints": true
     }
   ]
 }
