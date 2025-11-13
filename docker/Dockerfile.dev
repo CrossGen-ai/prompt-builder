@@ -1,0 +1,37 @@
+# ==============================================================================
+# AI Prompt Builder - Development Dockerfile
+# ==============================================================================
+# Optimized for development with hot-reload
+# ==============================================================================
+
+FROM node:20-alpine
+
+# Install development dependencies
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    sqlite \
+    sqlite-dev \
+    curl
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install all dependencies (including dev)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Create data directory
+RUN mkdir -p /app/data && chmod 755 /app/data
+
+# Expose ports
+EXPOSE 3000 9229
+
+# Development command (override in docker-compose)
+CMD ["npm", "run", "dev"]

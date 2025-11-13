@@ -1,0 +1,85 @@
+version: '3.8'
+
+# ==============================================================================
+# AI Prompt Builder - Development Docker Compose Configuration
+# ==============================================================================
+# Development configuration with hot-reload and debugging
+# Usage: docker compose -f docker/docker-compose.dev.yml up
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Development Application Service
+  # ----------------------------------------------------------------------------
+  app-dev:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+      args:
+        NODE_ENV: development
+
+    container_name: ai-prompt-builder-dev
+
+    restart: unless-stopped
+
+    ports:
+      - "${PORT:-3000}:3000"
+      - "9229:9229"  # Node.js debugging port
+
+    environment:
+      # Development Configuration
+      NODE_ENV: development
+      PORT: 3000
+      NEXT_TELEMETRY_DISABLED: 1
+
+      # Database Configuration
+      DATABASE_URL: file:/app/data/prompts.db
+
+      # Enable debugging
+      NODE_OPTIONS: "--inspect=0.0.0.0:9229"
+
+      # Hot reload
+      WATCHPACK_POLLING: true
+      CHOKIDAR_USEPOLLING: true
+
+      # API Keys
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+
+    volumes:
+      # Mount source code for hot-reload
+      - ../src:/app/src
+      - ../public:/app/public
+      - ../.next:/app/.next
+
+      # Persistent database
+      - dev-data:/app/data
+
+      # Exclude node_modules from mount
+      - /app/node_modules
+
+    networks:
+      - prompt-dev-network
+
+    command: npm run dev
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ==============================================================================
+# Volumes
+# ==============================================================================
+volumes:
+  dev-data:
+    driver: local
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+networks:
+  prompt-dev-network:
+    driver: bridge

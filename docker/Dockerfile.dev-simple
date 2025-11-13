@@ -1,0 +1,33 @@
+# Simple Development Dockerfile for AI Prompt Builder
+FROM node:20-alpine
+
+# Install dependencies for SQLite
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    sqlite \
+    sqlite-dev \
+    curl
+
+WORKDIR /app
+
+# Copy all files
+COPY . .
+
+# Install dependencies
+RUN npm install && \
+    cd app && npm install && cd .. && \
+    npm cache clean --force
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Expose port 3322
+ENV PORT=3322
+EXPOSE 3322
+
+# Run in development mode (no build required!)
+WORKDIR /app/app
+CMD ["npm", "run", "dev", "--", "-p", "3322"]

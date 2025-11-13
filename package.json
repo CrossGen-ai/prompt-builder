@@ -1,0 +1,68 @@
+{
+  "name": "memory-prompt-manager",
+  "version": "1.0.0",
+  "description": "AI Prompt Manager - Build, manage, and organize AI prompts with persistent storage",
+  "private": true,
+  "scripts": {
+    "dev": "cd app && npm run dev",
+    "build": "cd app && npm run build",
+    "start": "cd app && npm run start",
+    "lint": "cd app && npm run lint",
+    "typecheck": "cd app && npm run typecheck",
+    "test": "cd app && npm run test",
+    "test:watch": "cd app && npm run test:watch",
+    "test:coverage": "cd app && npm run test:coverage",
+    "install-all": "npm install && cd app && npm install",
+    "clean": "rm -rf app/node_modules app/.next app/out data/*.db .swarm/memory.db",
+    "db:migrate": "cd app && npm run db:migrate",
+    "db:seed": "cd app && npm run db:seed",
+    "db:studio": "cd app && npm run db:studio",
+    "docker:build": "docker-compose -f docker/docker-compose.yml build",
+    "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f docker/docker-compose.yml down",
+    "docker:logs": "docker-compose -f docker/docker-compose.yml logs -f app",
+    "docker:restart": "npm run docker:down && npm run docker:up",
+    "sparc:modes": "npx claude-flow sparc modes",
+    "sparc:run": "npx claude-flow sparc run",
+    "sparc:tdd": "npx claude-flow sparc tdd",
+    "sparc:batch": "npx claude-flow sparc batch",
+    "hooks:pre-task": "npx claude-flow@alpha hooks pre-task",
+    "hooks:post-task": "npx claude-flow@alpha hooks post-task",
+    "hooks:session-restore": "npx claude-flow@alpha hooks session-restore",
+    "format": "cd app && npm run format",
+    "validate": "npm run typecheck && npm run lint && npm run test"
+  },
+  "keywords": [
+    "ai",
+    "prompts",
+    "prompt-engineering",
+    "nextjs",
+    "react",
+    "typescript",
+    "sqlite",
+    "drizzle-orm",
+    "shadcn-ui",
+    "zustand"
+  ],
+  "author": "Memory Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/memory"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
+  "workspaces": [
+    "app"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "claude-flow": "^2.0.0",
+    "dotenv": "^17.2.3"
+  }
+}

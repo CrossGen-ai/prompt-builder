@@ -1,0 +1,76 @@
+You are generating an entirely new full-stack 
+application that replaces the functionality of the 
+attached HTML file (AI Prompt Builder UI). Rebuild 
+the system using modern, production-ready 
+architecture with the following constraints: 
+======================== ### SYSTEM REQUIREMENTS 
+======================== 1. **Frontend**
+   - Next.js 15 (App Router) - Tailwind v4 - shadCN 
+   UI (latest) - Typescript - Component-based 
+   architecture - State management using Zustand - 
+   Responsive layout - File structure must follow 
+   best practices:
+       /app /components /lib /db /types /styles 2. 
+**Backend**
+   - SQLite via Drizzle ORM - Tables:
+       - categories (id, name) - sections (id, 
+       category_id, description, prompt_text) - 
+       selected_sections (id, section_id) - 
+       custom_prompt (id, text, enabled)
+   - Provide migrations and schema - Backend 
+   endpoints should be REST (or server actions) for:
+       GET /categories POST /sections PUT 
+       /sections/:id DELETE /sections/:id POST 
+       /selection/:id DELETE /selection/:id GET 
+       /prompt (returns compiled prompt string)
+3. **Core Functionality to Reproduce from the 
+provided HTML file**
+   From the uploaded file, recreate these features:
+      - Category list with collapsible sections - 
+      Buttons for add/edit/delete - Checkbox 
+      selection of prompt fragments - Live generated 
+      prompt text panel - Copy-to-clipboard button - 
+      Modal for creating/editing sections - Modal for 
+      delete confirmation - Custom prompt input + 
+      toggle enable switch - Everything must be 
+      persisted in SQLite instead of localStorage
+4. **Extensibility**
+   The architecture must easily support:
+      - New section categories - Theme switching - 
+      User authentication in future versions - 
+      Multi-user prompt libraries - Export/import of 
+      prompt libraries
+   Build the abstraction layers with this in mind. 5. 
+**Docker Container**
+   Produce a fully working Docker setup:
+      - Dockerfile (multi-stage build) - 
+      docker-compose.yml with:
+           - app container - SQLite stored on a 
+           mounted volume
+      - README with step-by-step usage 
+======================== ### OUTPUT REQUIREMENTS 
+======================== For this single prompt, 
+output: 1. **Project Scaffolding**
+   Full file/folder tree 2. **Every File in the 
+Repo**
+   - All Next.js app code - All React components - 
+   All shadCN UI components - Zustand store - 
+   Tailwind config - Drizzle ORM schema + migrations 
+   - API endpoints or server actions - Dockerfile + 
+   docker-compose.yml - README.md
+3. **Seed Script**
+   Populate SQLite with the same default sections 
+from the uploaded file. 4. **One-click Start 
+Instructions**
+   - `docker compose up` - site available at 
+   `localhost:3000`
+======================== ### ORIGINAL FILE FOR 
+REFERENCE The full UI and behavior to recreate comes 
+from `prompt_builder_10-29 V4.html`. It includes 
+categories, modals, selection logic, default prompt 
+text, custom prompts, and live assembly of the final 
+prompt. Preserve all those UX expectations, but 
+rebuild the entire codebase using the modern stack 
+above. ======================== Now generate all code 
+files needed for the full working project.
+Do not summarize. Do not skip files. Output the complete project.

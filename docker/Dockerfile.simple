@@ -1,0 +1,38 @@
+# Simple Dockerfile for AI Prompt Builder with workspace support
+FROM node:20-alpine AS base
+
+# Install dependencies for SQLite
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    sqlite \
+    sqlite-dev \
+    dumb-init \
+    curl
+
+WORKDIR /app
+
+# Copy all workspace files
+COPY . .
+
+# Install all dependencies for both root and app workspace
+RUN npm install && \
+    cd app && npm install && cd .. && \
+    npm cache clean --force
+
+# Build the Next.js application
+WORKDIR /app/app
+RUN npm run build
+
+# Expose port
+ENV PORT=3322
+EXPOSE 3322
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Run migrations and start
+WORKDIR /app
+CMD ["sh", "-c", "cd app && npm run dev -- -p $PORT"]
