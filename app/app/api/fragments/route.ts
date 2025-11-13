@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db, schema } from '@/db'
+import type { Section } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 
 // GET /api/fragments - Get all fragments (sections)
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
     const sections = await query.orderBy(schema.sections.displayOrder)
 
     return NextResponse.json(
-      sections.map((section) => ({
+      sections.map((section: Section) => ({
         id: section.id.toString(),
         content: section.content,
         categoryId: section.categoryId.toString(),

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db, schema } from '@/db'
+import type { Category } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 
 // GET /api/categories - Get all categories
@@ -11,7 +12,7 @@ export async function GET() {
       .orderBy(schema.categories.displayOrder)
 
     return NextResponse.json(
-      categories.map((cat) => ({
+      categories.map((cat: Category) => ({
         id: cat.id.toString(),
         name: cat.name,
         description: cat.description,
