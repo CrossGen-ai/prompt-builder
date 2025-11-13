@@ -86,3 +86,8 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+
+# Logs directory (can be very large)
+logs/
+*.log
+*.jsonl
