@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { usePromptStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import { createMockFetch } from '../mocks/api.mock'
-import { mockCategories, mockSections } from '../fixtures/mockData'
+import { mockCategories, mockPromptFragments } from '../fixtures/mockData'
 
 // Mock the API module
 // Mock removed - using direct mock
@@ -20,7 +20,7 @@ describe('Prompt Builder Integration Tests', () => {
     // Reset store
     const store = usePromptStore.getState()
     store.setCategories([])
-    store.setSections([])
+    store.setPromptFragments([])
     store.clearSelection()
     store.setCustomPrompt('')
     store.setCustomEnabled(false)
@@ -33,7 +33,7 @@ describe('Prompt Builder Integration Tests', () => {
   })
 
   describe('Complete Workflow - Category to Prompt', () => {
-    it('should load categories and sections, then compile prompt', async () => {
+    it('should load categories and promptFragments, then compile prompt', async () => {
       const store = usePromptStore.getState()
 
       // Step 1: Load categories
@@ -43,22 +43,22 @@ describe('Prompt Builder Integration Tests', () => {
 
       expect(store.categories).toHaveLength(3)
 
-      // Step 2: Load sections
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      // Step 2: Load promptFragments
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
-      expect(store.sections).toHaveLength(5)
+      expect(store.promptFragments).toHaveLength(5)
 
-      // Step 3: Select sections from different categories
-      store.toggleSection('frag-1') // System Prompts
-      store.toggleSection('frag-3') // Code Guidelines
+      // Step 3: Select promptFragments from different categories
+      store.togglePromptFragment('frag-1') // System Prompts
+      store.togglePromptFragment('frag-3') // Code Guidelines
 
       // Step 4: Compile prompt
       const compiled = store.getCompiledPrompt()
 
-      expect(compiled.sectionCount).toBe(2)
-      expect(compiled.compiledText).toContain(mockSections[0].content)
-      expect(compiled.compiledText).toContain(mockSections[2].content)
+      expect(compiled.promptFragmentCount).toBe(2)
+      expect(compiled.compiledText).toContain(mockPromptFragments[0].content)
+      expect(compiled.compiledText).toContain(mockPromptFragments[2].content)
     })
 
     it('should handle full CRUD cycle for categories', async () => {
@@ -89,30 +89,30 @@ describe('Prompt Builder Integration Tests', () => {
       )
     })
 
-    it('should handle full CRUD cycle for sections', async () => {
+    it('should handle full CRUD cycle for promptFragments', async () => {
       mockFetch.setupSuccess()
 
-      // Create section
-      const newSection = {
+      // Create promptFragment
+      const newPromptFragment = {
         categoryId: 'cat-1',
-        content: 'New section content',
+        content: 'New promptFragment content',
         order: 1,
       }
 
-      const created = await api.sections.create(newSection)
+      const created = await api.promptFragments.create(newPromptFragment)
       expect(created).toHaveProperty('id')
-      expect(created.content).toBe(newSection.content)
+      expect(created.content).toBe(newPromptFragment.content)
 
-      // Update section
-      const updated = await api.sections.update(created.id, {
+      // Update promptFragment
+      const updated = await api.promptFragments.update(created.id, {
         content: 'Updated content',
       })
       expect(updated.content).toBe('Updated content')
 
-      // Delete section
-      await api.sections.delete(created.id)
+      // Delete promptFragment
+      await api.promptFragments.delete(created.id)
       expect(mockFetch.mock).toHaveBeenCalledWith(
-        expect.stringContaining(`/sections/${created.id}`),
+        expect.stringContaining(`/promptFragments/${created.id}`),
         expect.objectContaining({ method: 'DELETE' })
       )
     })
@@ -123,11 +123,11 @@ describe('Prompt Builder Integration Tests', () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
-      // Select section
-      store.toggleSection('frag-1')
+      // Select promptFragment
+      store.togglePromptFragment('frag-1')
 
       // Add custom prompt
       const customText = 'Custom instruction at the top'
@@ -139,17 +139,17 @@ describe('Prompt Builder Integration Tests', () => {
 
       expect(compiled.customPrompt).toBe(customText)
       expect(compiled.compiledText).toStartWith(customText)
-      expect(compiled.compiledText).toContain(mockSections[0].content)
+      expect(compiled.compiledText).toContain(mockPromptFragments[0].content)
     })
 
     it('should toggle custom prompt on/off', async () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
-      store.toggleSection('frag-1')
+      store.togglePromptFragment('frag-1')
       store.setCustomPrompt('Custom text')
 
       // With custom enabled
@@ -165,49 +165,49 @@ describe('Prompt Builder Integration Tests', () => {
   })
 
   describe('Multi-Category Selection', () => {
-    it('should select sections from multiple categories', async () => {
+    it('should select promptFragments from multiple categories', async () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
       // Select from cat-1
-      store.toggleSection('frag-1')
-      store.toggleSection('frag-2')
+      store.togglePromptFragment('frag-1')
+      store.togglePromptFragment('frag-2')
 
       // Select from cat-2
-      store.toggleSection('frag-3')
+      store.togglePromptFragment('frag-3')
 
       // Select from cat-3
-      store.toggleSection('frag-5')
+      store.togglePromptFragment('frag-5')
 
       const compiled = store.getCompiledPrompt()
 
-      expect(compiled.sectionCount).toBe(4)
-      expect(compiled.sections.map(f => f.categoryId)).toEqual(
+      expect(compiled.promptFragmentCount).toBe(4)
+      expect(compiled.promptFragments.map(f => f.categoryId)).toEqual(
         expect.arrayContaining(['cat-1', 'cat-2', 'cat-3'])
       )
     })
 
-    it('should maintain section order within compilation', async () => {
+    it('should maintain promptFragment order within compilation', async () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
       // Select in reverse order
-      store.toggleSection('frag-3')
-      store.toggleSection('frag-1')
-      store.toggleSection('frag-2')
+      store.togglePromptFragment('frag-3')
+      store.togglePromptFragment('frag-1')
+      store.togglePromptFragment('frag-2')
 
       const compiled = store.getCompiledPrompt()
 
-      // Should be ordered by section.order, not selection order
-      expect(compiled.sections[0].id).toBe('frag-1')
-      expect(compiled.sections[1].id).toBe('frag-2')
-      expect(compiled.sections[2].id).toBe('frag-3')
+      // Should be ordered by promptFragment.order, not selection order
+      expect(compiled.promptFragments[0].id).toBe('frag-1')
+      expect(compiled.promptFragments[1].id).toBe('frag-2')
+      expect(compiled.promptFragments[2].id).toBe('frag-3')
     })
   })
 
@@ -229,11 +229,11 @@ describe('Prompt Builder Integration Tests', () => {
       expect(store.error).toBe('Server error')
     })
 
-    it('should handle API errors during section creation', async () => {
+    it('should handle API errors during promptFragment creation', async () => {
       mockFetch.setupError(400, 'Invalid data')
 
       try {
-        await api.sections.create({
+        await api.promptFragments.create({
           categoryId: '',
           content: '',
           order: 1,
@@ -287,43 +287,43 @@ describe('Prompt Builder Integration Tests', () => {
 
       store.setLoading(true)
 
-      const [categories, sections] = await Promise.all([
+      const [categories, promptFragments] = await Promise.all([
         api.categories.getAll(),
-        api.sections.getAll(),
+        api.promptFragments.getAll(),
       ])
 
       store.setCategories(categories)
-      store.setSections(sections)
+      store.setPromptFragments(promptFragments)
       store.setLoading(false)
 
       expect(store.categories).toHaveLength(3)
-      expect(store.sections).toHaveLength(5)
+      expect(store.promptFragments).toHaveLength(5)
       expect(store.loading).toBe(false)
     })
   })
 
   describe('Category Filtering', () => {
-    it('should filter sections by category', async () => {
+    it('should filter promptFragments by category', async () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
-      const cat1Sections = store.getSectionsByCategory('cat-1')
-      const cat2Sections = store.getSectionsByCategory('cat-2')
+      const cat1PromptFragments = store.getPromptFragmentsByCategory('cat-1')
+      const cat2PromptFragments = store.getPromptFragmentsByCategory('cat-2')
 
-      expect(cat1Sections).toHaveLength(2)
-      expect(cat2Sections).toHaveLength(2)
-      expect(cat1Sections.every(f => f.categoryId === 'cat-1')).toBe(true)
+      expect(cat1PromptFragments).toHaveLength(2)
+      expect(cat2PromptFragments).toHaveLength(2)
+      expect(cat1PromptFragments.every(f => f.categoryId === 'cat-1')).toBe(true)
     })
 
-    it('should use API to fetch category-specific sections', async () => {
+    it('should use API to fetch category-specific promptFragments', async () => {
       mockFetch.setupSuccess()
 
-      const sections = await api.sections.getByCategory('cat-1')
+      const promptFragments = await api.promptFragments.getByCategory('cat-1')
 
-      expect(sections.every(f => f.categoryId === 'cat-1')).toBe(true)
+      expect(promptFragments.every(f => f.categoryId === 'cat-1')).toBe(true)
       expect(mockFetch.mock).toHaveBeenCalledWith(
         expect.stringContaining('categoryId=cat-1'),
         expect.any(Object)
@@ -336,11 +336,11 @@ describe('Prompt Builder Integration Tests', () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
-      store.toggleSection('frag-1')
-      store.toggleSection('frag-2')
+      store.togglePromptFragment('frag-1')
+      store.togglePromptFragment('frag-2')
 
       const compiled = store.getCompiledPrompt()
 
@@ -354,47 +354,47 @@ describe('Prompt Builder Integration Tests', () => {
   })
 
   describe('State Persistence Scenarios', () => {
-    it('should maintain selections after section reload', async () => {
+    it('should maintain selections after promptFragment reload', async () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      let sections = await api.sections.getAll()
-      store.setSections(sections)
+      let promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
       // Make selections
-      store.toggleSection('frag-1')
-      store.toggleSection('frag-3')
+      store.togglePromptFragment('frag-1')
+      store.togglePromptFragment('frag-3')
 
-      expect(store.selectedSectionIds.size).toBe(2)
+      expect(store.selectedPromptFragmentIds.size).toBe(2)
 
-      // Reload sections (simulating refresh)
-      sections = await api.sections.getAll()
-      store.setSections(sections)
+      // Reload promptFragments (simulating refresh)
+      promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
       // Selections should persist
-      expect(store.selectedSectionIds.size).toBe(2)
-      expect(store.selectedSectionIds.has('frag-1')).toBe(true)
-      expect(store.selectedSectionIds.has('frag-3')).toBe(true)
+      expect(store.selectedPromptFragmentIds.size).toBe(2)
+      expect(store.selectedPromptFragmentIds.has('frag-1')).toBe(true)
+      expect(store.selectedPromptFragmentIds.has('frag-3')).toBe(true)
     })
 
-    it('should clear invalid selections after sections update', async () => {
+    it('should clear invalid selections after promptFragments update', async () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
-      // Select sections
-      store.toggleSection('frag-1')
-      store.toggleSection('frag-2')
-      store.toggleSection('deleted-section') // Doesn't exist
+      // Select promptFragments
+      store.togglePromptFragment('frag-1')
+      store.togglePromptFragment('frag-2')
+      store.togglePromptFragment('deleted-promptFragment') // Doesn't exist
 
-      // Get selected sections
-      const selected = store.getSelectedSections()
+      // Get selected promptFragments
+      const selected = store.getSelectedPromptFragments()
 
-      // Should only return existing sections
+      // Should only return existing promptFragments
       expect(selected).toHaveLength(2)
-      expect(selected.some(f => f.id === 'deleted-section')).toBe(false)
+      expect(selected.some(f => f.id === 'deleted-promptFragment')).toBe(false)
     })
   })
 
@@ -403,14 +403,14 @@ describe('Prompt Builder Integration Tests', () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
       const compiled = store.getCompiledPrompt()
 
-      expect(compiled.sectionCount).toBe(0)
+      expect(compiled.promptFragmentCount).toBe(0)
       expect(compiled.compiledText).toBe('')
-      expect(compiled.sections).toEqual([])
+      expect(compiled.promptFragments).toEqual([])
     })
 
     it('should handle empty categories list', async () => {
@@ -423,50 +423,50 @@ describe('Prompt Builder Integration Tests', () => {
       expect(categories).toEqual([])
     })
 
-    it('should handle deleting selected section', async () => {
+    it('should handle deleting selected promptFragment', async () => {
       const store = usePromptStore.getState()
 
       mockFetch.setupSuccess()
-      const sections = await api.sections.getAll()
-      store.setSections(sections)
+      const promptFragments = await api.promptFragments.getAll()
+      store.setPromptFragments(promptFragments)
 
-      // Select section
-      store.toggleSection('frag-1')
-      expect(store.selectedSectionIds.has('frag-1')).toBe(true)
+      // Select promptFragment
+      store.togglePromptFragment('frag-1')
+      expect(store.selectedPromptFragmentIds.has('frag-1')).toBe(true)
 
-      // Delete section
-      await api.sections.delete('frag-1')
+      // Delete promptFragment
+      await api.promptFragments.delete('frag-1')
 
-      // Reload sections (without deleted one)
-      const updatedSections = sections.filter(f => f.id !== 'frag-1')
-      store.setSections(updatedSections)
+      // Reload promptFragments (without deleted one)
+      const updatedPromptFragments = promptFragments.filter(f => f.id !== 'frag-1')
+      store.setPromptFragments(updatedPromptFragments)
 
       // Compiled prompt should handle gracefully
       const compiled = store.getCompiledPrompt()
-      expect(compiled.sections.some(f => f.id === 'frag-1')).toBe(false)
+      expect(compiled.promptFragments.some(f => f.id === 'frag-1')).toBe(false)
     })
 
     it('should handle very long compiled prompts', async () => {
       const store = usePromptStore.getState()
 
-      // Create many sections
-      const manySections = Array.from({ length: 100 }, (_, i) => ({
+      // Create many promptFragments
+      const manyPromptFragments = Array.from({ length: 100 }, (_, i) => ({
         id: `frag-${i}`,
         categoryId: 'cat-1',
-        content: `Section ${i} with some longer content to make it realistic`,
+        content: `PromptFragment ${i} with some longer content to make it realistic`,
         order: i,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }))
 
-      store.setSections(manySections)
+      store.setPromptFragments(manyPromptFragments)
 
       // Select all
-      manySections.forEach(f => store.toggleSection(f.id))
+      manyPromptFragments.forEach(f => store.togglePromptFragment(f.id))
 
       const compiled = store.getCompiledPrompt()
 
-      expect(compiled.sectionCount).toBe(100)
+      expect(compiled.promptFragmentCount).toBe(100)
       expect(compiled.compiledText.length).toBeGreaterThan(1000)
     })
   })

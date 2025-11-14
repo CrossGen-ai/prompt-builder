@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { PromptBuilderState, Category, Section, CompiledPrompt } from './types'
+import { PromptBuilderState, Category, PromptFragment, CompiledPrompt } from './types'
 import { api } from './api'
 
 /**
@@ -10,13 +10,13 @@ interface ExtendedPromptBuilderState extends PromptBuilderState {
   // Enhanced loading states
   loadingStates: {
     categories: boolean
-    sections: boolean
+    promptFragments: boolean
     createCategory: boolean
     updateCategory: boolean
     deleteCategory: boolean
-    createSection: boolean
-    updateSection: boolean
-    deleteSection: boolean
+    createPromptFragment: boolean
+    updatePromptFragment: boolean
+    deletePromptFragment: boolean
   }
 
   // Async actions for categories
@@ -25,17 +25,17 @@ interface ExtendedPromptBuilderState extends PromptBuilderState {
   updateCategory: (id: string, data: Partial<Category>) => Promise<Category | null>
   deleteCategory: (id: string) => Promise<boolean>
 
-  // Async actions for sections
-  fetchSections: () => Promise<void>
-  addSection: (section: Omit<Section, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Section | null>
-  updateSection: (id: string, data: Partial<Section>) => Promise<Section | null>
-  deleteSection: (id: string) => Promise<boolean>
+  // Async actions for promptFragments
+  fetchPromptFragments: () => Promise<void>
+  addPromptFragment: (promptFragment: Omit<PromptFragment, 'id' | 'createdAt' | 'updatedAt'>) => Promise<PromptFragment | null>
+  updatePromptFragment: (id: string, data: Partial<PromptFragment>) => Promise<PromptFragment | null>
+  deletePromptFragment: (id: string) => Promise<boolean>
 
   // Selection management
-  selectSection: (id: string) => void
-  deselectSection: (id: string) => void
-  selectMultipleSections: (ids: string[]) => void
-  deselectMultipleSections: (ids: string[]) => void
+  selectPromptFragment: (id: string) => void
+  deselectPromptFragment: (id: string) => void
+  selectMultiplePromptFragments: (ids: string[]) => void
+  deselectMultiplePromptFragments: (ids: string[]) => void
 
   // Custom prompt management
   updateCustomPrompt: (text: string, enabled?: boolean) => void
@@ -62,27 +62,27 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
     (set, get) => ({
       // Initial state
       categories: [],
-      sections: [],
-      selectedSectionIds: new Set<string>(),
+      promptFragments: [],
+      selectedPromptFragmentIds: new Set<string>(),
       customPrompt: '',
       customEnabled: false,
       loading: false,
       error: null,
       loadingStates: {
         categories: false,
-        sections: false,
+        promptFragments: false,
         createCategory: false,
         updateCategory: false,
         deleteCategory: false,
-        createSection: false,
-        updateSection: false,
-        deleteSection: false,
+        createPromptFragment: false,
+        updatePromptFragment: false,
+        deletePromptFragment: false,
       },
 
       // Basic setters
       setCategories: (categories) => set({ categories }, false, 'setCategories'),
 
-      setSections: (sections) => set({ sections }, false, 'setSections'),
+      setPromptFragments: (promptFragments) => set({ promptFragments }, false, 'setPromptFragments'),
 
       setCustomPrompt: (customPrompt) => set({ customPrompt }, false, 'setCustomPrompt'),
 
@@ -94,48 +94,48 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
 
       resetError: () => set({ error: null }, false, 'resetError'),
 
-      // Section selection management
-      toggleSection: (sectionId) =>
+      // PromptFragment selection management
+      togglePromptFragment: (promptFragmentId) =>
         set((state) => {
-          const newSelected = new Set(state.selectedSectionIds)
-          if (newSelected.has(sectionId)) {
-            newSelected.delete(sectionId)
+          const newSelected = new Set(state.selectedPromptFragmentIds)
+          if (newSelected.has(promptFragmentId)) {
+            newSelected.delete(promptFragmentId)
           } else {
-            newSelected.add(sectionId)
+            newSelected.add(promptFragmentId)
           }
-          return { selectedSectionIds: newSelected }
-        }, false, 'toggleSection'),
+          return { selectedPromptFragmentIds: newSelected }
+        }, false, 'togglePromptFragment'),
 
-      selectSection: (id) =>
+      selectPromptFragment: (id) =>
         set((state) => {
-          const newSelected = new Set(state.selectedSectionIds)
+          const newSelected = new Set(state.selectedPromptFragmentIds)
           newSelected.add(id)
-          return { selectedSectionIds: newSelected }
-        }, false, 'selectSection'),
+          return { selectedPromptFragmentIds: newSelected }
+        }, false, 'selectPromptFragment'),
 
-      deselectSection: (id) =>
+      deselectPromptFragment: (id) =>
         set((state) => {
-          const newSelected = new Set(state.selectedSectionIds)
+          const newSelected = new Set(state.selectedPromptFragmentIds)
           newSelected.delete(id)
-          return { selectedSectionIds: newSelected }
-        }, false, 'deselectSection'),
+          return { selectedPromptFragmentIds: newSelected }
+        }, false, 'deselectPromptFragment'),
 
-      selectMultipleSections: (ids) =>
+      selectMultiplePromptFragments: (ids) =>
         set((state) => {
-          const newSelected = new Set(state.selectedSectionIds)
+          const newSelected = new Set(state.selectedPromptFragmentIds)
           ids.forEach((id) => newSelected.add(id))
-          return { selectedSectionIds: newSelected }
-        }, false, 'selectMultipleSections'),
+          return { selectedPromptFragmentIds: newSelected }
+        }, false, 'selectMultiplePromptFragments'),
 
-      deselectMultipleSections: (ids) =>
+      deselectMultiplePromptFragments: (ids) =>
         set((state) => {
-          const newSelected = new Set(state.selectedSectionIds)
+          const newSelected = new Set(state.selectedPromptFragmentIds)
           ids.forEach((id) => newSelected.delete(id))
-          return { selectedSectionIds: newSelected }
-        }, false, 'deselectMultipleSections'),
+          return { selectedPromptFragmentIds: newSelected }
+        }, false, 'deselectMultiplePromptFragments'),
 
       clearSelection: () =>
-        set({ selectedSectionIds: new Set<string>() }, false, 'clearSelection'),
+        set({ selectedPromptFragmentIds: new Set<string>() }, false, 'clearSelection'),
 
       // Custom prompt management
       updateCustomPrompt: (text, enabled) =>
@@ -166,25 +166,25 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
         }
       },
 
-      // Async: Fetch all sections
-      fetchSections: async () => {
+      // Async: Fetch all promptFragments
+      fetchPromptFragments: async () => {
         set((state) => ({
-          loadingStates: { ...state.loadingStates, sections: true },
+          loadingStates: { ...state.loadingStates, promptFragments: true },
           error: null,
-        }), false, 'fetchSections:start')
+        }), false, 'fetchPromptFragments:start')
 
         try {
-          const sections = await api.sections.getAll()
+          const promptFragments = await api.promptFragments.getAll()
           set((state) => ({
-            sections,
-            loadingStates: { ...state.loadingStates, sections: false },
-          }), false, 'fetchSections:success')
+            promptFragments,
+            loadingStates: { ...state.loadingStates, promptFragments: false },
+          }), false, 'fetchPromptFragments:success')
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Failed to fetch sections'
+          const errorMessage = error instanceof Error ? error.message : 'Failed to fetch promptFragments'
           set((state) => ({
             error: errorMessage,
-            loadingStates: { ...state.loadingStates, sections: false },
-          }), false, 'fetchSections:error')
+            loadingStates: { ...state.loadingStates, promptFragments: false },
+          }), false, 'fetchPromptFragments:error')
         }
       },
 
@@ -302,8 +302,8 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
         // Optimistic delete
         set((state) => ({
           categories: state.categories.filter((cat) => cat.id !== id),
-          // Also remove sections in this category
-          sections: state.sections.filter((frag) => frag.categoryId !== id),
+          // Also remove promptFragments in this category
+          promptFragments: state.promptFragments.filter((frag) => frag.categoryId !== id),
         }), false, 'deleteCategory:optimistic')
 
         try {
@@ -322,150 +322,150 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
             loadingStates: { ...state.loadingStates, deleteCategory: false },
           }), false, 'deleteCategory:error')
 
-          // Note: We don't restore sections as they might have changed
-          // Consider fetching sections again if needed
-          get().fetchSections()
+          // Note: We don't restore promptFragments as they might have changed
+          // Consider fetching promptFragments again if needed
+          get().fetchPromptFragments()
 
           return false
         }
       },
 
-      // Async: Add new section with optimistic update
-      addSection: async (sectionData) => {
+      // Async: Add new promptFragment with optimistic update
+      addPromptFragment: async (promptFragmentData) => {
         set((state) => ({
-          loadingStates: { ...state.loadingStates, createSection: true },
+          loadingStates: { ...state.loadingStates, createPromptFragment: true },
           error: null,
-        }), false, 'addSection:start')
+        }), false, 'addPromptFragment:start')
 
-        // Create optimistic section
-        const optimisticSection: PromptSection = {
+        // Create optimistic promptFragment
+        const optimisticPromptFragment: PromptFragment = {
           id: `temp-${Date.now()}`,
-          ...sectionData,
+          ...promptFragmentData,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
 
         // Optimistic update
         set((state) => ({
-          sections: [...state.sections, optimisticSection],
-        }), false, 'addSection:optimistic')
+          promptFragments: [...state.promptFragments, optimisticPromptFragment],
+        }), false, 'addPromptFragment:optimistic')
 
         try {
-          const newSection = await api.sections.create(sectionData)
+          const newPromptFragment = await api.promptFragments.create(promptFragmentData)
 
           // Replace optimistic with real data
           set((state) => ({
-            sections: state.sections.map((frag) =>
-              frag.id === optimisticSection.id ? newSection : frag
+            promptFragments: state.promptFragments.map((frag) =>
+              frag.id === optimisticPromptFragment.id ? newPromptFragment : frag
             ),
-            loadingStates: { ...state.loadingStates, createSection: false },
-          }), false, 'addSection:success')
+            loadingStates: { ...state.loadingStates, createPromptFragment: false },
+          }), false, 'addPromptFragment:success')
 
-          return newSection
+          return newPromptFragment
         } catch (error) {
           // Rollback optimistic update
           set((state) => ({
-            sections: state.sections.filter((frag) => frag.id !== optimisticSection.id),
-            error: error instanceof Error ? error.message : 'Failed to create section',
-            loadingStates: { ...state.loadingStates, createSection: false },
-          }), false, 'addSection:error')
+            promptFragments: state.promptFragments.filter((frag) => frag.id !== optimisticPromptFragment.id),
+            error: error instanceof Error ? error.message : 'Failed to create promptFragment',
+            loadingStates: { ...state.loadingStates, createPromptFragment: false },
+          }), false, 'addPromptFragment:error')
 
           return null
         }
       },
 
-      // Async: Update section with optimistic update
-      updateSection: async (id, data) => {
+      // Async: Update promptFragment with optimistic update
+      updatePromptFragment: async (id, data) => {
         set((state) => ({
-          loadingStates: { ...state.loadingStates, updateSection: true },
+          loadingStates: { ...state.loadingStates, updatePromptFragment: true },
           error: null,
-        }), false, 'updateSection:start')
+        }), false, 'updatePromptFragment:start')
 
         // Store original for rollback
-        const originalSection = get().sections.find((frag) => frag.id === id)
-        if (!originalSection) {
+        const originalPromptFragment = get().promptFragments.find((frag) => frag.id === id)
+        if (!originalPromptFragment) {
           set((state) => ({
-            error: 'Section not found',
-            loadingStates: { ...state.loadingStates, updateSection: false },
-          }), false, 'updateSection:notFound')
+            error: 'PromptFragment not found',
+            loadingStates: { ...state.loadingStates, updatePromptFragment: false },
+          }), false, 'updatePromptFragment:notFound')
           return null
         }
 
         // Optimistic update
         set((state) => ({
-          sections: state.sections.map((frag) =>
+          promptFragments: state.promptFragments.map((frag) =>
             frag.id === id ? { ...frag, ...data, updatedAt: new Date().toISOString() } : frag
           ),
-        }), false, 'updateSection:optimistic')
+        }), false, 'updatePromptFragment:optimistic')
 
         try {
-          const updatedSection = await api.sections.update(id, data)
+          const updatedPromptFragment = await api.promptFragments.update(id, data)
 
           // Replace with real data
           set((state) => ({
-            sections: state.sections.map((frag) =>
-              frag.id === id ? updatedSection : frag
+            promptFragments: state.promptFragments.map((frag) =>
+              frag.id === id ? updatedPromptFragment : frag
             ),
-            loadingStates: { ...state.loadingStates, updateSection: false },
-          }), false, 'updateSection:success')
+            loadingStates: { ...state.loadingStates, updatePromptFragment: false },
+          }), false, 'updatePromptFragment:success')
 
-          return updatedSection
+          return updatedPromptFragment
         } catch (error) {
           // Rollback optimistic update
           set((state) => ({
-            sections: state.sections.map((frag) =>
-              frag.id === id ? originalSection : frag
+            promptFragments: state.promptFragments.map((frag) =>
+              frag.id === id ? originalPromptFragment : frag
             ),
-            error: error instanceof Error ? error.message : 'Failed to update section',
-            loadingStates: { ...state.loadingStates, updateSection: false },
-          }), false, 'updateSection:error')
+            error: error instanceof Error ? error.message : 'Failed to update promptFragment',
+            loadingStates: { ...state.loadingStates, updatePromptFragment: false },
+          }), false, 'updatePromptFragment:error')
 
           return null
         }
       },
 
-      // Async: Delete section with optimistic update
-      deleteSection: async (id) => {
+      // Async: Delete promptFragment with optimistic update
+      deletePromptFragment: async (id) => {
         set((state) => ({
-          loadingStates: { ...state.loadingStates, deleteSection: true },
+          loadingStates: { ...state.loadingStates, deletePromptFragment: true },
           error: null,
-        }), false, 'deleteSection:start')
+        }), false, 'deletePromptFragment:start')
 
         // Store original for rollback
-        const originalSection = get().sections.find((frag) => frag.id === id)
-        if (!originalSection) {
+        const originalPromptFragment = get().promptFragments.find((frag) => frag.id === id)
+        if (!originalPromptFragment) {
           set((state) => ({
-            error: 'Section not found',
-            loadingStates: { ...state.loadingStates, deleteSection: false },
-          }), false, 'deleteSection:notFound')
+            error: 'PromptFragment not found',
+            loadingStates: { ...state.loadingStates, deletePromptFragment: false },
+          }), false, 'deletePromptFragment:notFound')
           return false
         }
 
         // Optimistic delete
         set((state) => {
-          const newSelected = new Set(state.selectedSectionIds)
+          const newSelected = new Set(state.selectedPromptFragmentIds)
           newSelected.delete(id)
           return {
-            sections: state.sections.filter((frag) => frag.id !== id),
-            selectedSectionIds: newSelected,
+            promptFragments: state.promptFragments.filter((frag) => frag.id !== id),
+            selectedPromptFragmentIds: newSelected,
           }
-        }, false, 'deleteSection:optimistic')
+        }, false, 'deletePromptFragment:optimistic')
 
         try {
-          await api.sections.delete(id)
+          await api.promptFragments.delete(id)
 
           set((state) => ({
-            loadingStates: { ...state.loadingStates, deleteSection: false },
-          }), false, 'deleteSection:success')
+            loadingStates: { ...state.loadingStates, deletePromptFragment: false },
+          }), false, 'deletePromptFragment:success')
 
           return true
         } catch (error) {
           // Rollback optimistic delete
           set((state) => ({
-            sections: [...state.sections, originalSection].sort((a, b) => a.order - b.order),
-            error: error instanceof Error ? error.message : 'Failed to delete section',
-            loadingStates: { ...state.loadingStates, deleteSection: false },
-          }), false, 'deleteSection:error')
+            promptFragments: [...state.promptFragments, originalPromptFragment].sort((a, b) => a.order - b.order),
+            error: error instanceof Error ? error.message : 'Failed to delete promptFragment',
+            loadingStates: { ...state.loadingStates, deletePromptFragment: false },
+          }), false, 'deletePromptFragment:error')
 
           return false
         }
@@ -478,7 +478,7 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
         try {
           await Promise.all([
             get().fetchCategories(),
-            get().fetchSections(),
+            get().fetchPromptFragments(),
           ])
           set({ loading: false }, false, 'initializeStore:success')
         } catch (error) {
@@ -492,38 +492,38 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
       // Computed: Get compiled prompt
       getCompiledPrompt: (): CompiledPrompt => {
         const state = get()
-        const selectedSections = state.sections
-          .filter((f) => state.selectedSectionIds.has(f.id))
+        const selectedPromptFragments = state.promptFragments
+          .filter((f) => state.selectedPromptFragmentIds.has(f.id))
           .sort((a, b) => a.order - b.order)
 
-        let compiledText = selectedSections.map((f) => f.content).join('\n\n')
+        let compiledText = selectedPromptFragments.map((f) => f.content).join('\n\n')
 
         if (state.customEnabled && state.customPrompt.trim()) {
           compiledText = state.customPrompt.trim() + '\n\n' + compiledText
         }
 
         return {
-          sections: selectedSections,
+          promptFragments: selectedPromptFragments,
           customPrompt: state.customEnabled ? state.customPrompt : undefined,
           compiledText: compiledText.trim(),
-          sectionCount: selectedSections.length,
+          promptFragmentCount: selectedPromptFragments.length,
           customEnabled: state.customEnabled,
         }
       },
 
-      // Computed: Get sections by category
-      getSectionsByCategory: (categoryId: string): PromptSection[] => {
+      // Computed: Get promptFragments by category
+      getPromptFragmentsByCategory: (categoryId: string): PromptFragment[] => {
         return get()
-          .sections
+          .promptFragments
           .filter((f) => f.categoryId === categoryId)
           .sort((a, b) => a.order - b.order)
       },
 
-      // Computed: Get selected sections
-      getSelectedSections: (): PromptSection[] => {
+      // Computed: Get selected promptFragments
+      getSelectedPromptFragments: (): PromptFragment[] => {
         const state = get()
-        return state.sections
-          .filter((f) => state.selectedSectionIds.has(f.id))
+        return state.promptFragments
+          .filter((f) => state.selectedPromptFragmentIds.has(f.id))
           .sort((a, b) => a.order - b.order)
       },
     }),
@@ -542,11 +542,11 @@ export const usePromptStore = create<ExtendedPromptBuilderState>()(
 // Get only categories
 export const useCategories = () => usePromptStore((state) => state.categories)
 
-// Get only sections
-export const useSections = () => usePromptStore((state) => state.sections)
+// Get only promptFragments
+export const usePromptFragments = () => usePromptStore((state) => state.promptFragments)
 
-// Get only selected section IDs
-export const useSelectedSectionIds = () => usePromptStore((state) => state.selectedSectionIds)
+// Get only selected promptFragment IDs
+export const useSelectedPromptFragmentIds = () => usePromptStore((state) => state.selectedPromptFragmentIds)
 
 // Get only custom prompt state
 export const useCustomPrompt = () => usePromptStore((state) => ({
@@ -563,13 +563,13 @@ export const useError = () => usePromptStore((state) => state.error)
 // Get compiled prompt (memoized)
 export const useCompiledPrompt = () => usePromptStore((state) => state.getCompiledPrompt())
 
-// Get sections for specific category
-export const useSectionsByCategory = (categoryId: string) =>
-  usePromptStore((state) => state.getSectionsByCategory(categoryId))
+// Get promptFragments for specific category
+export const usePromptFragmentsByCategory = (categoryId: string) =>
+  usePromptStore((state) => state.getPromptFragmentsByCategory(categoryId))
 
-// Get selected sections
-export const useSelectedSections = () =>
-  usePromptStore((state) => state.getSelectedSections())
+// Get selected promptFragments
+export const useSelectedPromptFragments = () =>
+  usePromptStore((state) => state.getSelectedPromptFragments())
 
 // Get category actions
 export const useCategoryActions = () =>
@@ -580,16 +580,16 @@ export const useCategoryActions = () =>
     deleteCategory: state.deleteCategory,
   }))
 
-// Get section actions
-export const useSectionActions = () =>
+// Get promptFragment actions
+export const usePromptFragmentActions = () =>
   usePromptStore((state) => ({
-    fetchSections: state.fetchSections,
-    addSection: state.addSection,
-    updateSection: state.updateSection,
-    deleteSection: state.deleteSection,
-    selectSection: state.selectSection,
-    deselectSection: state.deselectSection,
-    toggleSection: state.toggleSection,
+    fetchPromptFragments: state.fetchPromptFragments,
+    addPromptFragment: state.addPromptFragment,
+    updatePromptFragment: state.updatePromptFragment,
+    deletePromptFragment: state.deletePromptFragment,
+    selectPromptFragment: state.selectPromptFragment,
+    deselectPromptFragment: state.deselectPromptFragment,
+    togglePromptFragment: state.togglePromptFragment,
     clearSelection: state.clearSelection,
   }))
 

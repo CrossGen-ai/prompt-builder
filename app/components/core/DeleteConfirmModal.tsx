@@ -15,7 +15,7 @@ import { AlertTriangle, Loader2 } from 'lucide-react'
 
 interface DeleteConfirmModalProps {
   isOpen: boolean
-  type: 'category' | 'section'
+  type: 'category' | 'promptFragment'
   itemName?: string
   onClose: () => void
   onConfirm: () => Promise<void>
@@ -43,14 +43,14 @@ export function DeleteConfirmModal({
   }
 
   const getTitle = () => {
-    return type === 'category' ? 'Delete Category' : 'Delete Section'
+    return type === 'category' ? 'Delete Category' : 'Delete PromptFragment'
   }
 
   const getDescription = () => {
     if (type === 'category') {
-      return 'This will permanently delete this category and all its sections. This action cannot be undone.'
+      return 'This will permanently delete this category and all its promptFragments. This action cannot be undone.'
     }
-    return 'This will permanently delete this section. This action cannot be undone.'
+    return 'This will permanently delete this promptFragment. This action cannot be undone.'
   }
 
   return (
@@ -75,7 +75,7 @@ export function DeleteConfirmModal({
           {itemName && (
             <div className="mt-3 rounded-lg bg-muted p-3">
               <p className="text-sm font-medium">
-                {type === 'category' ? 'Category' : 'Section'}: {itemName}
+                {type === 'category' ? 'Category' : 'PromptFragment'}: {itemName}
               </p>
             </div>
           )}

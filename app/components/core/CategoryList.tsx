@@ -2,8 +2,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Category, PromptSection } from '@/lib/types'
-import { SectionItem } from './SectionItem'
+import { Category, PromptFragment } from '@/lib/types'
+import { PromptFragmentItem } from './PromptFragmentItem'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -12,24 +12,24 @@ import { cn } from '@/lib/utils'
 
 interface CategoryListProps {
   category: Category
-  sections: PromptSection[]
-  selectedSectionIds: Set<string>
-  onToggleSection: (sectionId: string) => void
-  onAddSection: (category: Category) => void
-  onEditSection: (section: PromptSection) => void
-  onDeleteSection: (section: PromptSection) => void
+  promptFragments: PromptFragment[]
+  selectedPromptFragmentIds: Set<string>
+  onTogglePromptFragment: (promptFragmentId: string) => void
+  onAddPromptFragment: (category: Category) => void
+  onEditPromptFragment: (promptFragment: PromptFragment) => void
+  onDeletePromptFragment: (promptFragment: PromptFragment) => void
   onEditCategory: (category: Category) => void
   onDeleteCategory: (category: Category) => void
 }
 
 export function CategoryList({
   category,
-  sections,
-  selectedSectionIds,
-  onToggleSection,
-  onAddSection,
-  onEditSection,
-  onDeleteSection,
+  promptFragments,
+  selectedPromptFragmentIds,
+  onTogglePromptFragment,
+  onAddPromptFragment,
+  onEditPromptFragment,
+  onDeletePromptFragment,
   onEditCategory,
   onDeleteCategory,
 }: CategoryListProps) {
@@ -57,7 +57,7 @@ export function CategoryList({
                   {category.name}
                 </CardTitle>
                 <span className="ml-2 text-sm text-muted-foreground">
-                  ({sections.length})
+                  ({promptFragments.length})
                 </span>
               </Button>
             </CollapsibleTrigger>
@@ -66,8 +66,8 @@ export function CategoryList({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => onAddSection(category)}
-                aria-label="Add section"
+                onClick={() => onAddPromptFragment(category)}
+                aria-label="Add promptFragment"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -100,31 +100,31 @@ export function CategoryList({
         {/* @ts-ignore React 19 type compatibility */}
         <CollapsibleContent>
           <CardContent className="p-4 pt-0">
-            {sections.length === 0 ? (
+            {promptFragments.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
                 <p className="text-sm text-muted-foreground">
-                  No sections in this category yet.
+                  No promptFragments in this category yet.
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   className="mt-4"
-                  onClick={() => onAddSection(category)}
+                  onClick={() => onAddPromptFragment(category)}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Add First Section
+                  Add First PromptFragment
                 </Button>
               </div>
             ) : (
               <div className="space-y-2">
-                {sections.map((section) => (
-                  <SectionItem
-                    key={section.id}
-                    section={section}
-                    isSelected={selectedSectionIds.has(section.id)}
-                    onToggle={onToggleSection}
-                    onEdit={onEditSection}
-                    onDelete={onDeleteSection}
+                {promptFragments.map((promptFragment) => (
+                  <PromptFragmentItem
+                    key={promptFragment.id}
+                    promptFragment={promptFragment}
+                    isSelected={selectedPromptFragmentIds.has(promptFragment.id)}
+                    onToggle={onTogglePromptFragment}
+                    onEdit={onEditPromptFragment}
+                    onDelete={onDeletePromptFragment}
                   />
                 ))}
               </div>

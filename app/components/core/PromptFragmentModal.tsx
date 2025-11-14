@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { PromptSection, Category } from '@/lib/types'
+import { PromptPromptFragment, Category } from '@/lib/types'
 import {
   Dialog,
   DialogContent,
@@ -16,17 +16,17 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Loader2 } from 'lucide-react'
 
-interface SectionModalProps {
+interface PromptFragmentModalProps {
   isOpen: boolean
   mode: 'add' | 'edit'
-  type: 'category' | 'section'
-  initialData?: Partial<Category | PromptSection> | null
+  type: 'category' | 'promptFragment'
+  initialData?: Partial<Category | PromptPromptFragment> | null
   categories?: Category[]
   onClose: () => void
   onSubmit: (data: any) => Promise<void>
 }
 
-export function SectionModal({
+export function PromptFragmentModal({
   isOpen,
   mode,
   type,
@@ -34,7 +34,7 @@ export function SectionModal({
   categories = [],
   onClose,
   onSubmit,
-}: SectionModalProps) {
+}: PromptFragmentModalProps) {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<any>({})
 
@@ -47,10 +47,10 @@ export function SectionModal({
           description: categoryData?.description || '',
         })
       } else {
-        const sectionData = initialData as Partial<PromptSection>
+        const promptFragmentData = initialData as Partial<PromptPromptFragment>
         setFormData({
-          content: sectionData?.content || '',
-          categoryId: sectionData?.categoryId || categories[0]?.id || '',
+          content: promptFragmentData?.content || '',
+          categoryId: promptFragmentData?.categoryId || categories[0]?.id || '',
         })
       }
     }
@@ -73,18 +73,18 @@ export function SectionModal({
     if (type === 'category') {
       return mode === 'add' ? 'Add Category' : 'Edit Category'
     }
-    return mode === 'add' ? 'Add Section' : 'Edit Section'
+    return mode === 'add' ? 'Add PromptFragment' : 'Edit PromptFragment'
   }
 
   const getDescription = () => {
     if (type === 'category') {
       return mode === 'add'
-        ? 'Create a new category to organize your prompt sections'
+        ? 'Create a new category to organize your prompt promptFragments'
         : 'Update the category details'
     }
     return mode === 'add'
-      ? 'Create a new prompt section in this category'
-      : 'Update the section content'
+      ? 'Create a new prompt promptFragment in this category'
+      : 'Update the promptFragment content'
   }
 
   return (
@@ -154,7 +154,7 @@ export function SectionModal({
                     id="content"
                     value={formData.content || ''}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    placeholder="Enter the prompt section content..."
+                    placeholder="Enter the prompt promptFragment content..."
                     rows={8}
                     required
                     autoFocus

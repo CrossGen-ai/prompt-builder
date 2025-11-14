@@ -2,43 +2,43 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db, schema } from '@/db'
 import { eq } from 'drizzle-orm'
 
-// GET /api/sections/:id - Get a specific section
+// GET /api/prompt-fragments/:id - Get a specific prompt fragment
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
-    const [section] = await db
+    const [fragment] = await db
       .select()
-      .from(schema.sections)
-      .where(eq(schema.sections.id, parseInt(id)))
+      .from(schema.promptFragments)
+      .where(eq(schema.promptFragments.id, parseInt(id)))
 
-    if (!section) {
+    if (!fragment) {
       return NextResponse.json(
-        { message: 'Section not found' },
+        { message: 'Prompt fragment not found' },
         { status: 404 }
       )
     }
 
     return NextResponse.json({
-      id: section.id.toString(),
-      content: section.content,
-      categoryId: section.categoryId.toString(),
-      order: section.displayOrder,
-      createdAt: section.createdAt,
-      updatedAt: section.updatedAt,
+      id: fragment.id.toString(),
+      content: fragment.content,
+      categoryId: fragment.categoryId.toString(),
+      order: fragment.displayOrder,
+      createdAt: fragment.createdAt,
+      updatedAt: fragment.updatedAt,
     })
   } catch (error) {
-    console.error('Error fetching section:', error)
+    console.error('Error fetching fragment:', error)
     return NextResponse.json(
-      { message: 'Failed to fetch section' },
+      { message: 'Failed to fetch fragment' },
       { status: 500 }
     )
   }
 }
 
-// PUT /api/sections/:id - Update a section
+// PUT /api/fragments/:id - Update a fragment
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -59,37 +59,37 @@ export async function PUT(
     if (categoryId !== undefined) updateData.categoryId = parseInt(categoryId)
     if (order !== undefined) updateData.displayOrder = order
 
-    const [section] = await db
-      .update(schema.sections)
+    const [fragment] = await db
+      .update(schema.promptFragments)
       .set(updateData)
-      .where(eq(schema.sections.id, parseInt(id)))
+      .where(eq(schema.promptFragments.id, parseInt(id)))
       .returning()
 
-    if (!section) {
+    if (!fragment) {
       return NextResponse.json(
-        { message: 'Section not found' },
+        { message: 'Prompt fragment not found' },
         { status: 404 }
       )
     }
 
     return NextResponse.json({
-      id: section.id.toString(),
-      content: section.content,
-      categoryId: section.categoryId.toString(),
-      order: section.displayOrder,
-      createdAt: section.createdAt,
-      updatedAt: section.updatedAt,
+      id: fragment.id.toString(),
+      content: fragment.content,
+      categoryId: fragment.categoryId.toString(),
+      order: fragment.displayOrder,
+      createdAt: fragment.createdAt,
+      updatedAt: fragment.updatedAt,
     })
   } catch (error) {
-    console.error('Error updating section:', error)
+    console.error('Error updating fragment:', error)
     return NextResponse.json(
-      { message: 'Failed to update section' },
+      { message: 'Failed to update fragment' },
       { status: 500 }
     )
   }
 }
 
-// DELETE /api/sections/:id - Delete a section
+// DELETE /api/fragments/:id - Delete a fragment
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -97,14 +97,14 @@ export async function DELETE(
   try {
     const { id } = await params
     await db
-      .delete(schema.sections)
-      .where(eq(schema.sections.id, parseInt(id)))
+      .delete(schema.promptFragments)
+      .where(eq(schema.promptFragments.id, parseInt(id)))
 
     return new NextResponse(null, { status: 204 })
   } catch (error) {
-    console.error('Error deleting section:', error)
+    console.error('Error deleting fragment:', error)
     return NextResponse.json(
-      { message: 'Failed to delete section' },
+      { message: 'Failed to delete fragment' },
       { status: 500 }
     )
   }

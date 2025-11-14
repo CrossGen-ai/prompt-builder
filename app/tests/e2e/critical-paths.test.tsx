@@ -9,7 +9,7 @@ import { renderHook, act } from '@testing-library/react'
 import { usePromptStore } from '@/lib/store'
 import { api } from '@/lib/api'
 import { createMockFetch } from '../mocks/api.mock'
-import { mockCategories, mockSections } from '../fixtures/mockData'
+import { mockCategories, mockPromptFragments } from '../fixtures/mockData'
 
 describe('Critical Path Tests', () => {
   let mockFetch: ReturnType<typeof createMockFetch>
@@ -23,7 +23,7 @@ describe('Critical Path Tests', () => {
     const { result } = renderHook(() => usePromptStore())
     act(() => {
       result.current.setCategories([])
-      result.current.setSections([])
+      result.current.setPromptFragments([])
       result.current.clearSelection()
       result.current.setCustomPrompt('')
       result.current.setCustomEnabled(false)
@@ -42,14 +42,14 @@ describe('Critical Path Tests', () => {
       expect(categories.length).toBeGreaterThan(0)
     })
 
-    it('MUST load sections on startup', async () => {
+    it('MUST load promptFragments on startup', async () => {
       mockFetch.setupSuccess()
 
-      const sections = await api.sections.getAll()
+      const promptFragments = await api.promptFragments.getAll()
 
-      expect(sections).toBeDefined()
-      expect(Array.isArray(sections)).toBe(true)
-      expect(sections.length).toBeGreaterThan(0)
+      expect(promptFragments).toBeDefined()
+      expect(Array.isArray(promptFragments)).toBe(true)
+      expect(promptFragments.length).toBeGreaterThan(0)
     })
 
     it('MUST handle initialization errors gracefully', async () => {
@@ -75,93 +75,93 @@ describe('Critical Path Tests', () => {
     })
   })
 
-  describe('[CRITICAL] Section Selection', () => {
-    it('MUST select section when clicked', async () => {
+  describe('[CRITICAL] PromptFragment Selection', () => {
+    it('MUST select promptFragment when clicked', async () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
       })
 
-      expect(result.current.selectedSectionIds.has('frag-1')).toBe(true)
+      expect(result.current.selectedPromptFragmentIds.has('frag-1')).toBe(true)
     })
 
-    it('MUST deselect section when clicked again', async () => {
+    it('MUST deselect promptFragment when clicked again', async () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-1')
       })
 
-      expect(result.current.selectedSectionIds.has('frag-1')).toBe(false)
+      expect(result.current.selectedPromptFragmentIds.has('frag-1')).toBe(false)
     })
 
     it('MUST handle multiple selections', async () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-2')
-        result.current.toggleSection('frag-3')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-2')
+        result.current.togglePromptFragment('frag-3')
       })
 
-      expect(result.current.selectedSectionIds.size).toBe(3)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(3)
     })
 
     it('MUST clear all selections', async () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-2')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-2')
         result.current.clearSelection()
       })
 
-      expect(result.current.selectedSectionIds.size).toBe(0)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(0)
     })
   })
 
   describe('[CRITICAL] Prompt Compilation', () => {
-    it('MUST compile selected sections into prompt', async () => {
+    it('MUST compile selected promptFragments into prompt', async () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-2')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-2')
       })
 
       const compiled = result.current.getCompiledPrompt()
 
       expect(compiled).toBeDefined()
       expect(compiled.compiledText).toBeTruthy()
-      expect(compiled.sectionCount).toBe(2)
-      expect(compiled.compiledText).toContain(mockSections[0].content)
-      expect(compiled.compiledText).toContain(mockSections[1].content)
+      expect(compiled.promptFragmentCount).toBe(2)
+      expect(compiled.compiledText).toContain(mockPromptFragments[0].content)
+      expect(compiled.compiledText).toContain(mockPromptFragments[1].content)
     })
 
-    it('MUST order sections correctly in compilation', async () => {
+    it('MUST order promptFragments correctly in compilation', async () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
         // Select in reverse order
-        result.current.toggleSection('frag-2')
-        result.current.toggleSection('frag-1')
+        result.current.togglePromptFragment('frag-2')
+        result.current.togglePromptFragment('frag-1')
       })
 
       const compiled = result.current.getCompiledPrompt()
 
-      // Should be ordered by section.order, not selection order
-      const section1Index = compiled.compiledText.indexOf(mockSections[0].content)
-      const section2Index = compiled.compiledText.indexOf(mockSections[1].content)
+      // Should be ordered by promptFragment.order, not selection order
+      const promptFragment1Index = compiled.compiledText.indexOf(mockPromptFragments[0].content)
+      const promptFragment2Index = compiled.compiledText.indexOf(mockPromptFragments[1].content)
 
-      expect(section1Index).toBeLessThan(section2Index)
+      expect(promptFragment1Index).toBeLessThan(promptFragment2Index)
     })
 
     it('MUST include custom prompt when enabled', async () => {
@@ -169,8 +169,8 @@ describe('Critical Path Tests', () => {
       const customText = 'Custom instruction'
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt(customText)
         result.current.setCustomEnabled(true)
       })
@@ -186,8 +186,8 @@ describe('Critical Path Tests', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt('Custom text')
         result.current.setCustomEnabled(false)
       })
@@ -202,14 +202,14 @@ describe('Critical Path Tests', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
       })
 
       const compiled = result.current.getCompiledPrompt()
 
-      expect(compiled.sectionCount).toBe(0)
+      expect(compiled.promptFragmentCount).toBe(0)
       expect(compiled.compiledText).toBe('')
-      expect(compiled.sections).toEqual([])
+      expect(compiled.promptFragments).toEqual([])
     })
   })
 
@@ -218,8 +218,8 @@ describe('Critical Path Tests', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
       })
 
       const compiled = result.current.getCompiledPrompt()
@@ -233,8 +233,8 @@ describe('Critical Path Tests', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
       })
 
       const compiled = result.current.getCompiledPrompt()
@@ -299,48 +299,48 @@ describe('Critical Path Tests', () => {
     })
   })
 
-  describe('[CRITICAL] Section Management', () => {
-    it('MUST create new section', async () => {
+  describe('[CRITICAL] PromptFragment Management', () => {
+    it('MUST create new promptFragment', async () => {
       mockFetch.setupSuccess()
 
-      const newSection = {
+      const newPromptFragment = {
         categoryId: 'cat-1',
-        content: 'New section content',
+        content: 'New promptFragment content',
         order: 1,
       }
 
-      const created = await api.sections.create(newSection)
+      const created = await api.promptFragments.create(newPromptFragment)
 
       expect(created).toHaveProperty('id')
-      expect(created.content).toBe(newSection.content)
-      expect(created.categoryId).toBe(newSection.categoryId)
+      expect(created.content).toBe(newPromptFragment.content)
+      expect(created.categoryId).toBe(newPromptFragment.categoryId)
     })
 
-    it('MUST update existing section', async () => {
+    it('MUST update existing promptFragment', async () => {
       mockFetch.setupSuccess()
 
       const updates = { content: 'Updated content' }
-      const updated = await api.sections.update('frag-1', updates)
+      const updated = await api.promptFragments.update('frag-1', updates)
 
       expect(updated.content).toBe('Updated content')
     })
 
-    it('MUST delete section', async () => {
+    it('MUST delete promptFragment', async () => {
       mockFetch.setupSuccess()
 
-      await api.sections.delete('frag-1')
+      await api.promptFragments.delete('frag-1')
 
       expect(mockFetch.mock).toHaveBeenCalledWith(
-        expect.stringContaining('/sections/frag-1'),
+        expect.stringContaining('/promptFragments/frag-1'),
         expect.objectContaining({ method: 'DELETE' })
       )
     })
 
-    it('MUST validate section data', async () => {
-      mockFetch.setupError(400, 'Invalid section data')
+    it('MUST validate promptFragment data', async () => {
+      mockFetch.setupError(400, 'Invalid promptFragment data')
 
       await expect(
-        api.sections.create({ categoryId: '', content: '', order: 1 })
+        api.promptFragments.create({ categoryId: '', content: '', order: 1 })
       ).rejects.toThrow()
     })
   })
@@ -433,14 +433,14 @@ describe('Critical Path Tests', () => {
 
       act(() => {
         result.current.setCategories(mockCategories)
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt('Test')
       })
 
       expect(result.current.categories).toEqual(mockCategories)
-      expect(result.current.sections).toEqual(mockSections)
-      expect(result.current.selectedSectionIds.has('frag-1')).toBe(true)
+      expect(result.current.promptFragments).toEqual(mockPromptFragments)
+      expect(result.current.selectedPromptFragmentIds.has('frag-1')).toBe(true)
       expect(result.current.customPrompt).toBe('Test')
     })
 
@@ -448,17 +448,17 @@ describe('Critical Path Tests', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
       })
 
-      const firstSet = result.current.selectedSectionIds
+      const firstSet = result.current.selectedPromptFragmentIds
 
       act(() => {
-        result.current.toggleSection('frag-2')
+        result.current.togglePromptFragment('frag-2')
       })
 
-      const secondSet = result.current.selectedSectionIds
+      const secondSet = result.current.selectedPromptFragmentIds
 
       // New Set should be created
       expect(firstSet).not.toBe(secondSet)
@@ -470,20 +470,20 @@ describe('Critical Path Tests', () => {
       mockFetch.setupSuccess()
 
       const categories = await api.categories.getAll()
-      const sections = await api.sections.getAll()
+      const promptFragments = await api.promptFragments.getAll()
 
-      // All sections must reference valid categories
-      sections.forEach(section => {
-        const categoryExists = categories.some(cat => cat.id === section.categoryId)
+      // All promptFragments must reference valid categories
+      promptFragments.forEach(promptFragment => {
+        const categoryExists = categories.some(cat => cat.id === promptFragment.categoryId)
         expect(categoryExists).toBe(true)
       })
     })
 
-    it('MUST prevent orphaned sections', async () => {
+    it('MUST prevent orphaned promptFragments', async () => {
       mockFetch.setupError(404, 'Category not found')
 
       await expect(
-        api.sections.create({
+        api.promptFragments.create({
           categoryId: 'non-existent',
           content: 'Test',
           order: 1,
@@ -492,7 +492,7 @@ describe('Critical Path Tests', () => {
     })
 
     it('MUST handle cascade deletes', async () => {
-      mockFetch.setupError(409, 'Cannot delete category with sections')
+      mockFetch.setupError(409, 'Cannot delete category with promptFragments')
 
       await expect(api.categories.delete('cat-1')).rejects.toThrow()
     })

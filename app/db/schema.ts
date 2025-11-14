@@ -15,9 +15,9 @@ export const categories = pgTable('categories', {
 });
 
 /**
- * Sections table - Individual prompt components within categories
+ * Prompt Fragments table - Individual prompt components within categories
  */
-export const sections = pgTable('sections', {
+export const promptFragments = pgTable('prompt_fragments', {
   id: serial('id').primaryKey(),
   categoryId: integer('category_id').notNull().references(() => categories.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
@@ -30,11 +30,11 @@ export const sections = pgTable('sections', {
 });
 
 /**
- * Selected sections table - Tracks which sections are currently selected for prompt compilation
+ * Selected prompt fragments table - Tracks which fragments are currently selected for prompt compilation
  */
-export const selectedSections = pgTable('selected_sections', {
+export const selectedPromptFragments = pgTable('selected_prompt_fragments', {
   id: serial('id').primaryKey(),
-  sectionId: integer('section_id').notNull().references(() => sections.id, { onDelete: 'cascade' }),
+  promptFragmentId: integer('prompt_fragment_id').notNull().references(() => promptFragments.id, { onDelete: 'cascade' }),
   selectedAt: timestamp('selected_at').notNull().defaultNow()
 });
 
@@ -51,11 +51,11 @@ export const customPrompt = pgTable('custom_prompt', {
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 
-export type Section = typeof sections.$inferSelect;
-export type NewSection = typeof sections.$inferInsert;
+export type PromptFragment = typeof promptFragments.$inferSelect;
+export type NewPromptFragment = typeof promptFragments.$inferInsert;
 
-export type SelectedSection = typeof selectedSections.$inferSelect;
-export type NewSelectedSection = typeof selectedSections.$inferInsert;
+export type SelectedPromptFragment = typeof selectedPromptFragments.$inferSelect;
+export type NewSelectedPromptFragment = typeof selectedPromptFragments.$inferInsert;
 
 export type CustomPrompt = typeof customPrompt.$inferSelect;
 export type NewCustomPrompt = typeof customPrompt.$inferInsert;

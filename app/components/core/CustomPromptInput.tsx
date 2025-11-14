@@ -27,7 +27,7 @@ export function CustomPromptInput({
           <div className="flex-1">
             <CardTitle className="text-lg">Custom Prompt</CardTitle>
             <CardDescription className="mt-1">
-              Add a custom prompt that will be prepended to selected sections
+              Add a custom prompt that will be prepended to selected promptFragments
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { mockCategories, mockSections } from '../fixtures/mockData'
+import { mockCategories, mockPromptFragments } from '../fixtures/mockData'
 
 export const createMockFetch = () => {
   const mockFetch = jest.fn()
@@ -59,16 +59,16 @@ export const createMockFetch = () => {
           }
         }
 
-        // Sections endpoints
-        if (url.includes('/sections') && !url.match(/\/sections\/[^/]+$/)) {
+        // PromptFragments endpoints
+        if (url.includes('/promptFragments') && !url.match(/\/promptFragments\/[^/]+$/)) {
           if (method === 'GET') {
             const categoryId = new URL(url, 'http://localhost').searchParams.get('categoryId')
-            const sections = categoryId
-              ? mockSections.filter(f => f.categoryId === categoryId)
-              : mockSections
+            const promptFragments = categoryId
+              ? mockPromptFragments.filter(f => f.categoryId === categoryId)
+              : mockPromptFragments
             return Promise.resolve({
               ok: true,
-              json: () => Promise.resolve(sections),
+              json: () => Promise.resolve(promptFragments),
             })
           }
           if (method === 'POST') {
@@ -85,12 +85,12 @@ export const createMockFetch = () => {
           }
         }
 
-        // Single section
-        if (url.match(/\/sections\/[^/]+$/)) {
+        // Single promptFragment
+        if (url.match(/\/promptFragments\/[^/]+$/)) {
           if (method === 'GET') {
             return Promise.resolve({
               ok: true,
-              json: () => Promise.resolve(mockSections[0]),
+              json: () => Promise.resolve(mockPromptFragments[0]),
             })
           }
           if (method === 'PUT') {
@@ -98,7 +98,7 @@ export const createMockFetch = () => {
             return Promise.resolve({
               ok: true,
               json: () => Promise.resolve({
-                ...mockSections[0],
+                ...mockPromptFragments[0],
                 ...body,
                 updatedAt: new Date().toISOString(),
               }),
@@ -115,10 +115,10 @@ export const createMockFetch = () => {
         // Compile endpoint
         if (url.includes('/compile')) {
           const body = JSON.parse(options?.body as string)
-          const sections = mockSections.filter(f =>
-            body.sectionIds.includes(f.id)
+          const promptFragments = mockPromptFragments.filter(f =>
+            body.promptFragmentIds.includes(f.id)
           )
-          let prompt = sections.map(f => f.content).join('\n\n')
+          let prompt = promptFragments.map(f => f.content).join('\n\n')
           if (body.customPrompt) {
             prompt = `${body.customPrompt}\n\n${prompt}`
           }

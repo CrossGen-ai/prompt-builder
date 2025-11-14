@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react'
 import { usePromptStore } from '@/lib/store'
 import { api } from '@/lib/api'
-import { Category, PromptSection } from '@/lib/types'
+import { Category, PromptPromptFragment } from '@/lib/types'
 import { CategoryList } from '@/components/core/CategoryList'
 import { PromptPreview } from '@/components/core/PromptPreview'
 import { CustomPromptInput } from '@/components/core/CustomPromptInput'
-import { SectionModal } from '@/components/core/SectionModal'
+import { PromptFragmentModal } from '@/components/core/PromptFragmentModal'
 import { DeleteConfirmModal } from '@/components/core/DeleteConfirmModal'
 import { Button } from '@/components/ui/button'
 import { Plus, RefreshCw, AlertCircle } from 'lucide-react'
@@ -15,35 +15,35 @@ import { Plus, RefreshCw, AlertCircle } from 'lucide-react'
 interface DialogState {
   isOpen: boolean
   mode: 'add' | 'edit'
-  type: 'category' | 'section'
-  data: Partial<Category | PromptSection> | null
+  type: 'category' | 'promptFragment'
+  data: Partial<Category | PromptPromptFragment> | null
   categoryContext?: Category
 }
 
 interface DeleteDialogState {
   isOpen: boolean
-  type: 'category' | 'section'
-  item: Category | PromptSection | null
+  type: 'category' | 'promptFragment'
+  item: Category | PromptPromptFragment | null
 }
 
 export default function Home() {
   const {
     categories,
-    sections,
-    selectedSectionIds,
+    promptFragments,
+    selectedPromptFragmentIds,
     customPrompt,
     customEnabled,
     loading,
     error,
     setCategories,
-    setSections,
-    toggleSection,
+    setPromptFragments,
+    togglePromptFragment,
     setCustomPrompt,
     setCustomEnabled,
     setLoading,
     setError,
     getCompiledPrompt,
-    getSectionsByCategory,
+    getPromptFragmentsByCategory,
   } = usePromptStore()
 
   const [dialogState, setDialogState] = useState<DialogState>({
@@ -68,12 +68,12 @@ export default function Home() {
     setLoading(true)
     setError(null)
     try {
-      const [categoriesData, sectionsData] = await Promise.all([
+      const [categoriesData, promptFragmentsData] = await Promise.all([
         api.categories.getAll(),
-        api.sections.getAll(),
+        api.promptFragments.getAll(),
       ])
       setCategories(categoriesData.sort((a, b) => a.order - b.order))
-      setSections(sectionsData)
+      setPromptFragments(promptFragmentsData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data')
     } finally {
@@ -108,31 +108,31 @@ export default function Home() {
     })
   }
 
-  // Section handlers
-  const handleAddSection = (category: Category) => {
+  // PromptFragment handlers
+  const handleAddPromptFragment = (category: Category) => {
     setDialogState({
       isOpen: true,
       mode: 'add',
-      type: 'section',
+      type: 'promptFragment',
       data: { categoryId: category.id },
       categoryContext: category,
     })
   }
 
-  const handleEditSection = (section: PromptSection) => {
+  const handleEditPromptFragment = (promptFragment: PromptPromptFragment) => {
     setDialogState({
       isOpen: true,
       mode: 'edit',
-      type: 'section',
-      data: section,
+      type: 'promptFragment',
+      data: promptFragment,
     })
   }
 
-  const handleDeleteSection = (section: PromptSection) => {
+  const handleDeletePromptFragment = (promptFragment: PromptPromptFragment) => {
     setDeleteDialogState({
       isOpen: true,
-      type: 'section',
-      item: section,
+      type: 'promptFragment',
+      item: promptFragment,
     })
   }
 
@@ -154,15 +154,15 @@ export default function Home() {
       }
     } else {
       if (mode === 'add') {
-        const newSection = await api.sections.create({
+        const newPromptFragment = await api.promptFragments.create({
           content: formData.content,
           categoryId: formData.categoryId,
-          order: sections.filter((f) => f.categoryId === formData.categoryId).length,
+          order: promptFragments.filter((f) => f.categoryId === formData.categoryId).length,
         })
-        setSections([...sections, newSection])
+        setPromptFragments([...promptFragments, newPromptFragment])
       } else if (data && 'id' in data) {
-        const updated = await api.sections.update(data.id!, formData)
-        setSections(sections.map((f) => (f.id === updated.id ? updated : f)))
+        const updated = await api.promptFragments.update(data.id!, formData)
+        setPromptFragments(promptFragments.map((f) => (f.id === updated.id ? updated : f)))
       }
     }
   }
@@ -174,11 +174,11 @@ export default function Home() {
     if (type === 'category') {
       await api.categories.delete(item.id)
       setCategories(categories.filter((c) => c.id !== item.id))
-      // Remove sections in this category
-      setSections(sections.filter((f) => f.categoryId !== item.id))
+      // Remove promptFragments in this category
+      setPromptFragments(promptFragments.filter((f) => f.categoryId !== item.id))
     } else {
-      await api.sections.delete(item.id)
-      setSections(sections.filter((f) => f.id !== item.id))
+      await api.promptFragments.delete(item.id)
+      setPromptFragments(promptFragments.filter((f) => f.id !== item.id))
     }
   }
 
@@ -199,15 +199,15 @@ export default function Home() {
         )}
 
         <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-[1fr_400px]">
-          {/* Left Column - Categories and Sections */}
+          {/* Left Column - Categories and PromptFragments */}
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Prompt Sections
+                  Prompt PromptFragments
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Select sections to build your prompt
+                  Select promptFragments to build your prompt
                 </p>
               </div>
               <Button onClick={handleAddCategory} className="w-full sm:w-auto shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transition-all">
@@ -235,7 +235,7 @@ export default function Home() {
                 </div>
                 <p className="mb-2 text-base sm:text-lg font-bold text-gray-800">No categories yet</p>
                 <p className="mb-6 text-sm sm:text-base text-muted-foreground max-w-md">
-                  Create your first category to organize prompt sections and start building amazing prompts
+                  Create your first category to organize prompt promptFragments and start building amazing prompts
                 </p>
                 <Button onClick={handleAddCategory} size="lg" className="shadow-xl shadow-blue-300 hover:shadow-2xl hover:shadow-blue-400 hover:scale-105 transition-all">
                   <Plus className="mr-2 h-5 w-5" />
@@ -248,12 +248,12 @@ export default function Home() {
                   <CategoryList
                     key={category.id}
                     category={category}
-                    sections={getSectionsByCategory(category.id)}
-                    selectedSectionIds={selectedSectionIds}
-                    onToggleSection={toggleSection}
-                    onAddSection={handleAddSection}
-                    onEditSection={handleEditSection}
-                    onDeleteSection={handleDeleteSection}
+                    promptFragments={getPromptFragmentsByCategory(category.id)}
+                    selectedPromptFragmentIds={selectedPromptFragmentIds}
+                    onTogglePromptFragment={togglePromptFragment}
+                    onAddPromptFragment={handleAddPromptFragment}
+                    onEditPromptFragment={handleEditPromptFragment}
+                    onDeletePromptFragment={handleDeletePromptFragment}
                     onEditCategory={handleEditCategory}
                     onDeleteCategory={handleDeleteCategory}
                   />
@@ -270,7 +270,7 @@ export default function Home() {
       </main>
 
       {/* Modals */}
-      <SectionModal
+      <PromptFragmentModal
         isOpen={dialogState.isOpen}
         mode={dialogState.mode}
         type={dialogState.type}
@@ -287,7 +287,7 @@ export default function Home() {
           deleteDialogState.item
             ? 'name' in deleteDialogState.item
               ? deleteDialogState.item.name
-              : (deleteDialogState.item as PromptSection).content.substring(0, 50) + '...'
+              : (deleteDialogState.item as PromptPromptFragment).content.substring(0, 50) + '...'
             : undefined
         }
         onClose={() => setDeleteDialogState({ ...deleteDialogState, isOpen: false })}

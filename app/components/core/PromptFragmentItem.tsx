@@ -1,28 +1,28 @@
 'use client'
 
 import React from 'react'
-import { PromptSection } from '@/lib/types'
+import { PromptPromptFragment } from '@/lib/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Edit2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface SectionItemProps {
-  section: PromptSection
+interface PromptFragmentItemProps {
+  promptFragment: PromptPromptFragment
   isSelected: boolean
-  onToggle: (sectionId: string) => void
-  onEdit: (section: PromptSection) => void
-  onDelete: (section: PromptSection) => void
+  onToggle: (promptFragmentId: string) => void
+  onEdit: (promptFragment: PromptPromptFragment) => void
+  onDelete: (promptFragment: PromptPromptFragment) => void
 }
 
-export function SectionItem({
-  section,
+export function PromptFragmentItem({
+  promptFragment,
   isSelected,
   onToggle,
   onEdit,
   onDelete,
-}: SectionItemProps) {
+}: PromptFragmentItemProps) {
   return (
     <Card
       className={cn(
@@ -38,18 +38,18 @@ export function SectionItem({
     >
       <div className="flex items-start gap-3 p-4">
         <Checkbox
-          id={`section-${section.id}`}
+          id={`promptFragment-${promptFragment.id}`}
           checked={isSelected}
-          onCheckedChange={() => onToggle(section.id)}
+          onCheckedChange={() => onToggle(promptFragment.id)}
           className="mt-1"
         />
         <div className="flex-1 min-w-0">
           <label
-            htmlFor={`section-${section.id}`}
+            htmlFor={`promptFragment-${promptFragment.id}`}
             className="cursor-pointer select-none"
           >
             <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-              {section.content}
+              {promptFragment.content}
             </p>
           </label>
         </div>
@@ -58,8 +58,8 @@ export function SectionItem({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => onEdit(section)}
-            aria-label="Edit section"
+            onClick={() => onEdit(promptFragment)}
+            aria-label="Edit promptFragment"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
@@ -67,8 +67,8 @@ export function SectionItem({
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-destructive hover:text-destructive"
-            onClick={() => onDelete(section)}
-            aria-label="Delete section"
+            onClick={() => onDelete(promptFragment)}
+            aria-label="Delete promptFragment"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

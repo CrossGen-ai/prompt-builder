@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react'
 import { usePromptStore } from '@/lib/store'
-import { mockCategories, mockSections, createMockSection } from '../fixtures/mockData'
+import { mockCategories, mockPromptFragments, createMockPromptFragment } from '../fixtures/mockData'
 
 describe('Zustand Store - usePromptStore', () => {
   beforeEach(() => {
@@ -8,7 +8,7 @@ describe('Zustand Store - usePromptStore', () => {
     const { result } = renderHook(() => usePromptStore())
     act(() => {
       result.current.setCategories([])
-      result.current.setSections([])
+      result.current.setPromptFragments([])
       result.current.clearSelection()
       result.current.setCustomPrompt('')
       result.current.setCustomEnabled(false)
@@ -22,8 +22,8 @@ describe('Zustand Store - usePromptStore', () => {
       const { result } = renderHook(() => usePromptStore())
 
       expect(result.current.categories).toEqual([])
-      expect(result.current.sections).toEqual([])
-      expect(result.current.selectedSectionIds).toEqual(new Set())
+      expect(result.current.promptFragments).toEqual([])
+      expect(result.current.selectedPromptFragmentIds).toEqual(new Set())
       expect(result.current.customPrompt).toBe('')
       expect(result.current.customEnabled).toBe(false)
       expect(result.current.loading).toBe(false)
@@ -56,85 +56,85 @@ describe('Zustand Store - usePromptStore', () => {
     })
   })
 
-  describe('setSections', () => {
-    it('should set sections', () => {
+  describe('setPromptFragments', () => {
+    it('should set promptFragments', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
       })
 
-      expect(result.current.sections).toEqual(mockSections)
-      expect(result.current.sections).toHaveLength(5)
+      expect(result.current.promptFragments).toEqual(mockPromptFragments)
+      expect(result.current.promptFragments).toHaveLength(5)
     })
 
-    it('should replace existing sections', () => {
+    it('should replace existing promptFragments', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.setSections([mockSections[0]])
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.setPromptFragments([mockPromptFragments[0]])
       })
 
-      expect(result.current.sections).toHaveLength(1)
+      expect(result.current.promptFragments).toHaveLength(1)
     })
   })
 
-  describe('toggleSection', () => {
-    it('should add section to selection when not selected', () => {
+  describe('togglePromptFragment', () => {
+    it('should add promptFragment to selection when not selected', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
       })
 
-      expect(result.current.selectedSectionIds.has('frag-1')).toBe(true)
-      expect(result.current.selectedSectionIds.size).toBe(1)
+      expect(result.current.selectedPromptFragmentIds.has('frag-1')).toBe(true)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(1)
     })
 
-    it('should remove section from selection when already selected', () => {
+    it('should remove promptFragment from selection when already selected', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-1')
       })
 
-      expect(result.current.selectedSectionIds.has('frag-1')).toBe(false)
-      expect(result.current.selectedSectionIds.size).toBe(0)
+      expect(result.current.selectedPromptFragmentIds.has('frag-1')).toBe(false)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(0)
     })
 
-    it('should handle multiple section selections', () => {
+    it('should handle multiple promptFragment selections', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-2')
-        result.current.toggleSection('frag-3')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-2')
+        result.current.togglePromptFragment('frag-3')
       })
 
-      expect(result.current.selectedSectionIds.size).toBe(3)
-      expect(result.current.selectedSectionIds.has('frag-1')).toBe(true)
-      expect(result.current.selectedSectionIds.has('frag-2')).toBe(true)
-      expect(result.current.selectedSectionIds.has('frag-3')).toBe(true)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(3)
+      expect(result.current.selectedPromptFragmentIds.has('frag-1')).toBe(true)
+      expect(result.current.selectedPromptFragmentIds.has('frag-2')).toBe(true)
+      expect(result.current.selectedPromptFragmentIds.has('frag-3')).toBe(true)
     })
 
     it('should handle toggle sequence correctly', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-2')
-        result.current.toggleSection('frag-1') // Remove frag-1
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-2')
+        result.current.togglePromptFragment('frag-1') // Remove frag-1
       })
 
-      expect(result.current.selectedSectionIds.size).toBe(1)
-      expect(result.current.selectedSectionIds.has('frag-1')).toBe(false)
-      expect(result.current.selectedSectionIds.has('frag-2')).toBe(true)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(1)
+      expect(result.current.selectedPromptFragmentIds.has('frag-1')).toBe(false)
+      expect(result.current.selectedPromptFragmentIds.has('frag-2')).toBe(true)
     })
   })
 
@@ -186,28 +186,28 @@ describe('Zustand Store - usePromptStore', () => {
   })
 
   describe('clearSelection', () => {
-    it('should clear all selected sections', () => {
+    it('should clear all selected promptFragments', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-2')
-        result.current.toggleSection('frag-3')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-2')
+        result.current.togglePromptFragment('frag-3')
         result.current.clearSelection()
       })
 
-      expect(result.current.selectedSectionIds.size).toBe(0)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(0)
     })
 
-    it('should work when no sections are selected', () => {
+    it('should work when no promptFragments are selected', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
         result.current.clearSelection()
       })
 
-      expect(result.current.selectedSectionIds.size).toBe(0)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(0)
     })
   })
 
@@ -259,52 +259,52 @@ describe('Zustand Store - usePromptStore', () => {
   })
 
   describe('getCompiledPrompt', () => {
-    it('should return empty compiled prompt when no sections selected', () => {
+    it('should return empty compiled prompt when no promptFragments selected', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
       })
 
       const compiled = result.current.getCompiledPrompt()
 
-      expect(compiled.sections).toEqual([])
+      expect(compiled.promptFragments).toEqual([])
       expect(compiled.compiledText).toBe('')
-      expect(compiled.sectionCount).toBe(0)
+      expect(compiled.promptFragmentCount).toBe(0)
       expect(compiled.customEnabled).toBe(false)
     })
 
-    it('should compile single section', () => {
+    it('should compile single promptFragment', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
       })
 
       const compiled = result.current.getCompiledPrompt()
 
-      expect(compiled.sections).toHaveLength(1)
-      expect(compiled.compiledText).toBe(mockSections[0].content)
-      expect(compiled.sectionCount).toBe(1)
+      expect(compiled.promptFragments).toHaveLength(1)
+      expect(compiled.compiledText).toBe(mockPromptFragments[0].content)
+      expect(compiled.promptFragmentCount).toBe(1)
     })
 
-    it('should compile multiple sections in correct order', () => {
+    it('should compile multiple promptFragments in correct order', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-2') // order: 2
-        result.current.toggleSection('frag-1') // order: 1
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-2') // order: 2
+        result.current.togglePromptFragment('frag-1') // order: 1
       })
 
       const compiled = result.current.getCompiledPrompt()
 
-      expect(compiled.sections).toHaveLength(2)
-      expect(compiled.sections[0].id).toBe('frag-1')
-      expect(compiled.sections[1].id).toBe('frag-2')
+      expect(compiled.promptFragments).toHaveLength(2)
+      expect(compiled.promptFragments[0].id).toBe('frag-1')
+      expect(compiled.promptFragments[1].id).toBe('frag-2')
       expect(compiled.compiledText).toBe(
-        `${mockSections[0].content}\n\n${mockSections[1].content}`
+        `${mockPromptFragments[0].content}\n\n${mockPromptFragments[1].content}`
       )
     })
 
@@ -313,8 +313,8 @@ describe('Zustand Store - usePromptStore', () => {
       const customText = 'Custom instruction'
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt(customText)
         result.current.setCustomEnabled(true)
       })
@@ -324,7 +324,7 @@ describe('Zustand Store - usePromptStore', () => {
       expect(compiled.customPrompt).toBe(customText)
       expect(compiled.customEnabled).toBe(true)
       expect(compiled.compiledText).toBe(
-        `${customText}\n\n${mockSections[0].content}`
+        `${customText}\n\n${mockPromptFragments[0].content}`
       )
     })
 
@@ -332,8 +332,8 @@ describe('Zustand Store - usePromptStore', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt('Custom text')
         result.current.setCustomEnabled(false)
       })
@@ -342,15 +342,15 @@ describe('Zustand Store - usePromptStore', () => {
 
       expect(compiled.customPrompt).toBeUndefined()
       expect(compiled.customEnabled).toBe(false)
-      expect(compiled.compiledText).toBe(mockSections[0].content)
+      expect(compiled.compiledText).toBe(mockPromptFragments[0].content)
     })
 
     it('should trim whitespace from custom prompt', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt('  \n  Custom  \n  ')
         result.current.setCustomEnabled(true)
       })
@@ -365,8 +365,8 @@ describe('Zustand Store - usePromptStore', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt('   ')
         result.current.setCustomEnabled(true)
       })
@@ -374,68 +374,68 @@ describe('Zustand Store - usePromptStore', () => {
       const compiled = result.current.getCompiledPrompt()
 
       // Empty custom prompt should not add extra newlines
-      expect(compiled.compiledText).toBe(mockSections[0].content)
+      expect(compiled.compiledText).toBe(mockPromptFragments[0].content)
     })
   })
 
-  describe('getSectionsByCategory', () => {
-    it('should return sections for specific category', () => {
+  describe('getPromptFragmentsByCategory', () => {
+    it('should return promptFragments for specific category', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
       })
 
-      const cat1Sections = result.current.getSectionsByCategory('cat-1')
+      const cat1PromptFragments = result.current.getPromptFragmentsByCategory('cat-1')
 
-      expect(cat1Sections).toHaveLength(2)
-      expect(cat1Sections.every(f => f.categoryId === 'cat-1')).toBe(true)
+      expect(cat1PromptFragments).toHaveLength(2)
+      expect(cat1PromptFragments.every(f => f.categoryId === 'cat-1')).toBe(true)
     })
 
-    it('should return sections in correct order', () => {
+    it('should return promptFragments in correct order', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
       })
 
-      const cat2Sections = result.current.getSectionsByCategory('cat-2')
+      const cat2PromptFragments = result.current.getPromptFragmentsByCategory('cat-2')
 
-      expect(cat2Sections[0].order).toBeLessThan(cat2Sections[1].order)
+      expect(cat2PromptFragments[0].order).toBeLessThan(cat2PromptFragments[1].order)
     })
 
     it('should return empty array for non-existent category', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
       })
 
-      const noSections = result.current.getSectionsByCategory('cat-999')
+      const noPromptFragments = result.current.getPromptFragmentsByCategory('cat-999')
 
-      expect(noSections).toEqual([])
+      expect(noPromptFragments).toEqual([])
     })
 
-    it('should return empty array when no sections loaded', () => {
+    it('should return empty array when no promptFragments loaded', () => {
       const { result } = renderHook(() => usePromptStore())
 
-      const noSections = result.current.getSectionsByCategory('cat-1')
+      const noPromptFragments = result.current.getPromptFragmentsByCategory('cat-1')
 
-      expect(noSections).toEqual([])
+      expect(noPromptFragments).toEqual([])
     })
   })
 
-  describe('getSelectedSections', () => {
-    it('should return only selected sections', () => {
+  describe('getSelectedPromptFragments', () => {
+    it('should return only selected promptFragments', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
-        result.current.toggleSection('frag-3')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
+        result.current.togglePromptFragment('frag-3')
       })
 
-      const selected = result.current.getSelectedSections()
+      const selected = result.current.getSelectedPromptFragments()
 
       expect(selected).toHaveLength(2)
       expect(selected.some(f => f.id === 'frag-1')).toBe(true)
@@ -446,10 +446,10 @@ describe('Zustand Store - usePromptStore', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
+        result.current.setPromptFragments(mockPromptFragments)
       })
 
-      const selected = result.current.getSelectedSections()
+      const selected = result.current.getSelectedPromptFragments()
 
       expect(selected).toEqual([])
     })
@@ -458,54 +458,54 @@ describe('Zustand Store - usePromptStore', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
       })
 
-      let selected = result.current.getSelectedSections()
+      let selected = result.current.getSelectedPromptFragments()
       expect(selected).toHaveLength(1)
 
       act(() => {
-        result.current.toggleSection('frag-2')
+        result.current.togglePromptFragment('frag-2')
       })
 
-      selected = result.current.getSelectedSections()
+      selected = result.current.getSelectedPromptFragments()
       expect(selected).toHaveLength(2)
     })
   })
 
   describe('Edge Cases', () => {
-    it('should handle selecting non-existent section gracefully', () => {
+    it('should handle selecting non-existent promptFragment gracefully', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('non-existent-id')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('non-existent-id')
       })
 
-      // Should add to selection even if section doesn't exist
-      expect(result.current.selectedSectionIds.has('non-existent-id')).toBe(true)
+      // Should add to selection even if promptFragment doesn't exist
+      expect(result.current.selectedPromptFragmentIds.has('non-existent-id')).toBe(true)
 
       // But compiled prompt should handle it gracefully
       const compiled = result.current.getCompiledPrompt()
-      expect(compiled.sections).toHaveLength(0)
+      expect(compiled.promptFragments).toHaveLength(0)
     })
 
     it('should handle rapid state changes', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.setSections(mockSections)
-        result.current.toggleSection('frag-1')
+        result.current.setPromptFragments(mockPromptFragments)
+        result.current.togglePromptFragment('frag-1')
         result.current.setCustomPrompt('Test')
         result.current.setCustomEnabled(true)
-        result.current.toggleSection('frag-2')
+        result.current.togglePromptFragment('frag-2')
         result.current.setLoading(true)
         result.current.setError('Error')
         result.current.clearSelection()
       })
 
-      expect(result.current.selectedSectionIds.size).toBe(0)
+      expect(result.current.selectedPromptFragmentIds.size).toBe(0)
       expect(result.current.customPrompt).toBe('Test')
       expect(result.current.loading).toBe(true)
       expect(result.current.error).toBe('Error')
@@ -515,16 +515,16 @@ describe('Zustand Store - usePromptStore', () => {
       const { result } = renderHook(() => usePromptStore())
 
       act(() => {
-        result.current.toggleSection('frag-1')
+        result.current.togglePromptFragment('frag-1')
       })
 
-      const firstSet = result.current.selectedSectionIds
+      const firstSet = result.current.selectedPromptFragmentIds
 
       act(() => {
-        result.current.toggleSection('frag-2')
+        result.current.togglePromptFragment('frag-2')
       })
 
-      const secondSet = result.current.selectedSectionIds
+      const secondSet = result.current.selectedPromptFragmentIds
 
       // New Set should be created on each update
       expect(firstSet).not.toBe(secondSet)

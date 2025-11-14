@@ -1,4 +1,4 @@
-import { Category, PromptSection, CompiledPrompt } from '@/lib/types'
+import { Category, PromptPromptFragment, CompiledPrompt } from '@/lib/types'
 
 export const mockCategories: Category[] = [
   {
@@ -27,7 +27,7 @@ export const mockCategories: Category[] = [
   },
 ]
 
-export const mockSections: PromptSection[] = [
+export const mockPromptFragments: PromptPromptFragment[] = [
   {
     id: 'frag-1',
     categoryId: 'cat-1',
@@ -71,18 +71,18 @@ export const mockSections: PromptSection[] = [
 ]
 
 export const mockCompiledPrompt: CompiledPrompt = {
-  sections: [mockSections[0], mockSections[2]],
+  promptFragments: [mockPromptFragments[0], mockPromptFragments[2]],
   customPrompt: undefined,
   compiledText: 'You are a helpful AI assistant.\n\nFollow TypeScript best practices.',
-  sectionCount: 2,
+  promptFragmentCount: 2,
   customEnabled: false,
 }
 
 export const mockCompiledPromptWithCustom: CompiledPrompt = {
-  sections: [mockSections[0]],
+  promptFragments: [mockPromptFragments[0]],
   customPrompt: 'Custom instruction here.',
   compiledText: 'Custom instruction here.\n\nYou are a helpful AI assistant.',
-  sectionCount: 1,
+  promptFragmentCount: 1,
   customEnabled: true,
 }
 
@@ -96,7 +96,7 @@ export const createMockCategory = (overrides?: Partial<Category>): Category => (
   ...overrides,
 })
 
-export const createMockSection = (overrides?: Partial<PromptSection>): PromptSection => ({
+export const createMockPromptFragment = (overrides?: Partial<PromptPromptFragment>): PromptPromptFragment => ({
   id: `frag-${Date.now()}`,
   categoryId: 'cat-1',
   content: 'Test content',

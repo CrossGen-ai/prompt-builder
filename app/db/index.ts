@@ -21,8 +21,8 @@ export { schema };
 // Export individual tables for direct use
 export {
   categories,
-  sections,
-  selectedSections,
+  promptFragments,
+  selectedPromptFragments,
   customPrompt,
   users,
   accounts,

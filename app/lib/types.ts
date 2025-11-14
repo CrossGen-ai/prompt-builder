@@ -1,4 +1,4 @@
-export interface Section {
+export interface PromptFragment {
   id: string;
   content: string;
   categoryId: string;
@@ -16,22 +16,22 @@ export interface Category {
   updatedAt: string;
 }
 
-export interface SectionWithCategory extends Section {
+export interface PromptFragmentWithCategory extends PromptFragment {
   category: Category;
 }
 
 export interface CompiledPrompt {
-  sections: Section[];
+  promptFragments: PromptFragment[];
   customPrompt?: string;
   compiledText: string;
-  sectionCount: number;
+  promptFragmentCount: number;
   customEnabled: boolean;
 }
 
 export interface PromptBuilderState {
   categories: Category[];
-  sections: Section[];
-  selectedSectionIds: Set<string>;
+  promptFragments: PromptFragment[];
+  selectedPromptFragmentIds: Set<string>;
   customPrompt: string;
   customEnabled: boolean;
   loading: boolean;
@@ -39,8 +39,8 @@ export interface PromptBuilderState {
 
   // Actions
   setCategories: (categories: Category[]) => void;
-  setSections: (sections: Section[]) => void;
-  toggleSection: (sectionId: string) => void;
+  setPromptFragments: (promptFragments: PromptFragment[]) => void;
+  togglePromptFragment: (promptFragmentId: string) => void;
   setCustomPrompt: (prompt: string) => void;
   setCustomEnabled: (enabled: boolean) => void;
   clearSelection: () => void;
@@ -49,13 +49,13 @@ export interface PromptBuilderState {
 
   // Computed
   getCompiledPrompt: () => CompiledPrompt;
-  getSectionsByCategory: (categoryId: string) => Section[];
-  getSelectedSections: () => Section[];
+  getPromptFragmentsByCategory: (categoryId: string) => PromptFragment[];
+  getSelectedPromptFragments: () => PromptFragment[];
 }
 
 export interface DialogState {
   isOpen: boolean;
   mode: 'add' | 'edit' | null;
-  type: 'category' | 'section' | null;
-  data: Partial<Category | Section> | null;
+  type: 'category' | 'promptFragment' | null;
+  data: Partial<Category | PromptFragment> | null;
 }
