@@ -49,7 +49,7 @@ export async function PUT(
     const { name, description, order } = body
 
     const updateData: any = {
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
     }
 
     if (name !== undefined) updateData.name = name

@@ -49,7 +49,7 @@ export async function PUT(
     const { content, categoryId, order } = body
 
     const updateData: any = {
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
     }
 
     if (content !== undefined) {

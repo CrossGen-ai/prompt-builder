@@ -26,8 +26,14 @@ export function SectionItem({
   return (
     <Card
       className={cn(
-        'group relative transition-all duration-200',
-        isSelected && 'border-primary bg-primary/5'
+        'group relative transition-all duration-300 hover:shadow-lg',
+        isSelected && [
+          'border-emerald-400/50',
+          'bg-gradient-to-br from-emerald-400/10 via-green-400/5 to-teal-400/10',
+          'backdrop-blur-sm',
+          'shadow-lg shadow-emerald-500/20',
+          'ring-1 ring-emerald-400/20'
+        ]
       )}
     >
       <div className="flex items-start gap-3 p-4">

@@ -63,20 +63,20 @@ export function PromptPreview({ compiledPrompt }: PromptPreviewProps) {
         </div>
       </CardHeader>
       <Separator />
-      <CardContent className="p-4">
+      <CardContent className="p-4 bg-white dark:bg-slate-950">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-8 text-center">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Select sections or add a custom prompt to see the preview
             </p>
           </div>
         ) : (
           <div className="relative">
-            <pre className="max-h-[600px] overflow-y-auto rounded-lg bg-muted p-4 text-sm leading-relaxed whitespace-pre-wrap break-words">
+            <pre className="max-h-[600px] overflow-y-auto rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 text-sm leading-relaxed whitespace-pre-wrap break-words text-slate-900 dark:text-slate-100">
               {compiledPrompt.compiledText}
             </pre>
-            <div className="mt-4 rounded-lg bg-muted/50 p-3">
-              <p className="text-xs text-muted-foreground">
+            <div className="mt-4 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Character count: {compiledPrompt.compiledText.length.toLocaleString()}
               </p>
             </div>

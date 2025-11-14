@@ -62,7 +62,7 @@ export function AuthButton({ user, onSignIn, onSignOut }: AuthButtonProps) {
         </Button>
       </DropdownMenuTrigger>
       {/* @ts-ignore React 19 type compatibility */}
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800" align="end" forceMount>
         {/* @ts-ignore React 19 type compatibility */}
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
