@@ -1,4 +1,4 @@
-import { Category, PromptPromptFragment, CompiledPrompt } from '@/lib/types'
+import { Category, PromptFragment, CompiledPrompt } from '@/lib/types'
 
 export const mockCategories: Category[] = [
   {
@@ -27,7 +27,7 @@ export const mockCategories: Category[] = [
   },
 ]
 
-export const mockPromptFragments: PromptPromptFragment[] = [
+export const mockPromptFragments: PromptFragment[] = [
   {
     id: 'frag-1',
     categoryId: 'cat-1',
@@ -96,7 +96,7 @@ export const createMockCategory = (overrides?: Partial<Category>): Category => (
   ...overrides,
 })
 
-export const createMockPromptFragment = (overrides?: Partial<PromptPromptFragment>): PromptPromptFragment => ({
+export const createMockPromptFragment = (overrides?: Partial<PromptFragment>): PromptFragment => ({
   id: `frag-${Date.now()}`,
   categoryId: 'cat-1',
   content: 'Test content',

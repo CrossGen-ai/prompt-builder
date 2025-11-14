@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { PromptPromptFragment } from '@/lib/types'
+import { PromptFragment } from '@/lib/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -9,11 +9,11 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface PromptFragmentItemProps {
-  promptFragment: PromptPromptFragment
+  promptFragment: PromptFragment
   isSelected: boolean
   onToggle: (promptFragmentId: string) => void
-  onEdit: (promptFragment: PromptPromptFragment) => void
-  onDelete: (promptFragment: PromptPromptFragment) => void
+  onEdit: (promptFragment: PromptFragment) => void
+  onDelete: (promptFragment: PromptFragment) => void
 }
 
 export function PromptFragmentItem({

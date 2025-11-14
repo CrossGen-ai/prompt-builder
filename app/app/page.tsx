@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { usePromptStore } from '@/lib/store'
 import { api } from '@/lib/api'
-import { Category, PromptPromptFragment } from '@/lib/types'
+import { Category, PromptFragment } from '@/lib/types'
 import { CategoryList } from '@/components/core/CategoryList'
 import { PromptPreview } from '@/components/core/PromptPreview'
 import { CustomPromptInput } from '@/components/core/CustomPromptInput'
@@ -16,14 +16,14 @@ interface DialogState {
   isOpen: boolean
   mode: 'add' | 'edit'
   type: 'category' | 'promptFragment'
-  data: Partial<Category | PromptPromptFragment> | null
+  data: Partial<Category | PromptFragment> | null
   categoryContext?: Category
 }
 
 interface DeleteDialogState {
   isOpen: boolean
   type: 'category' | 'promptFragment'
-  item: Category | PromptPromptFragment | null
+  item: Category | PromptFragment | null
 }
 
 export default function Home() {
@@ -119,7 +119,7 @@ export default function Home() {
     })
   }
 
-  const handleEditPromptFragment = (promptFragment: PromptPromptFragment) => {
+  const handleEditPromptFragment = (promptFragment: PromptFragment) => {
     setDialogState({
       isOpen: true,
       mode: 'edit',
@@ -128,7 +128,7 @@ export default function Home() {
     })
   }
 
-  const handleDeletePromptFragment = (promptFragment: PromptPromptFragment) => {
+  const handleDeletePromptFragment = (promptFragment: PromptFragment) => {
     setDeleteDialogState({
       isOpen: true,
       type: 'promptFragment',
@@ -287,7 +287,7 @@ export default function Home() {
           deleteDialogState.item
             ? 'name' in deleteDialogState.item
               ? deleteDialogState.item.name
-              : (deleteDialogState.item as PromptPromptFragment).content.substring(0, 50) + '...'
+              : (deleteDialogState.item as PromptFragment).content.substring(0, 50) + '...'
             : undefined
         }
         onClose={() => setDeleteDialogState({ ...deleteDialogState, isOpen: false })}

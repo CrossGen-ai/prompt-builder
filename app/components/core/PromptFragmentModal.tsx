@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { PromptPromptFragment, Category } from '@/lib/types'
+import { PromptFragment, Category } from '@/lib/types'
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,7 @@ interface PromptFragmentModalProps {
   isOpen: boolean
   mode: 'add' | 'edit'
   type: 'category' | 'promptFragment'
-  initialData?: Partial<Category | PromptPromptFragment> | null
+  initialData?: Partial<Category | PromptFragment> | null
   categories?: Category[]
   onClose: () => void
   onSubmit: (data: any) => Promise<void>
@@ -47,7 +47,7 @@ export function PromptFragmentModal({
           description: categoryData?.description || '',
         })
       } else {
-        const promptFragmentData = initialData as Partial<PromptPromptFragment>
+        const promptFragmentData = initialData as Partial<PromptFragment>
         setFormData({
           content: promptFragmentData?.content || '',
           categoryId: promptFragmentData?.categoryId || categories[0]?.id || '',
