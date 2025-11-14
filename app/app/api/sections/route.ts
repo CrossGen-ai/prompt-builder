@@ -3,7 +3,7 @@ import { db, schema } from '@/db'
 import type { Section } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 
-// GET /api/fragments - Get all fragments (sections)
+// GET /api/sections - Get all sections
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -28,15 +28,15 @@ export async function GET(request: NextRequest) {
       }))
     )
   } catch (error) {
-    console.error('Error fetching fragments:', error)
+    console.error('Error fetching sections:', error)
     return NextResponse.json(
-      { message: 'Failed to fetch fragments' },
+      { message: 'Failed to fetch sections' },
       { status: 500 }
     )
   }
 }
 
-// POST /api/fragments - Create a new fragment (section)
+// POST /api/sections - Create a new section
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -71,9 +71,9 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Error creating fragment:', error)
+    console.error('Error creating section:', error)
     return NextResponse.json(
-      { message: 'Failed to create fragment' },
+      { message: 'Failed to create section' },
       { status: 500 }
     )
   }

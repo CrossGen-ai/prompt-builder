@@ -15,7 +15,7 @@ import { AlertTriangle, Loader2 } from 'lucide-react'
 
 interface DeleteConfirmModalProps {
   isOpen: boolean
-  type: 'category' | 'fragment'
+  type: 'category' | 'section'
   itemName?: string
   onClose: () => void
   onConfirm: () => Promise<void>

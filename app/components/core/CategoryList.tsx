@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Category, PromptFragment } from '@/lib/types'
+import { Category, PromptSection } from '@/lib/types'
 import { SectionItem } from './SectionItem'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,21 +12,21 @@ import { cn } from '@/lib/utils'
 
 interface CategoryListProps {
   category: Category
-  fragments: PromptFragment[]
-  selectedFragmentIds: Set<string>
-  onToggleFragment: (fragmentId: string) => void
+  sections: PromptSection[]
+  selectedSectionIds: Set<string>
+  onToggleSection: (sectionId: string) => void
   onAddSection: (category: Category) => void
-  onEditSection: (fragment: PromptFragment) => void
-  onDeleteSection: (fragment: PromptFragment) => void
+  onEditSection: (section: PromptSection) => void
+  onDeleteSection: (section: PromptSection) => void
   onEditCategory: (category: Category) => void
   onDeleteCategory: (category: Category) => void
 }
 
 export function CategoryList({
   category,
-  fragments,
-  selectedFragmentIds,
-  onToggleFragment,
+  sections,
+  selectedSectionIds,
+  onToggleSection,
   onAddSection,
   onEditSection,
   onDeleteSection,
@@ -57,7 +57,7 @@ export function CategoryList({
                   {category.name}
                 </CardTitle>
                 <span className="ml-2 text-sm text-muted-foreground">
-                  ({fragments.length})
+                  ({sections.length})
                 </span>
               </Button>
             </CollapsibleTrigger>
@@ -100,7 +100,7 @@ export function CategoryList({
         {/* @ts-ignore React 19 type compatibility */}
         <CollapsibleContent>
           <CardContent className="p-4 pt-0">
-            {fragments.length === 0 ? (
+            {sections.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
                 <p className="text-sm text-muted-foreground">
                   No sections in this category yet.
@@ -117,12 +117,12 @@ export function CategoryList({
               </div>
             ) : (
               <div className="space-y-2">
-                {fragments.map((fragment) => (
+                {sections.map((section) => (
                   <SectionItem
-                    key={fragment.id}
-                    fragment={fragment}
-                    isSelected={selectedFragmentIds.has(fragment.id)}
-                    onToggle={onToggleFragment}
+                    key={section.id}
+                    section={section}
+                    isSelected={selectedSectionIds.has(section.id)}
+                    onToggle={onToggleSection}
                     onEdit={onEditSection}
                     onDelete={onDeleteSection}
                   />

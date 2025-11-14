@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { usePromptStore } from '@/lib/store'
 import { api } from '@/lib/api'
-import { Category, PromptFragment } from '@/lib/types'
+import { Category, PromptSection } from '@/lib/types'
 import { CategoryList } from '@/components/core/CategoryList'
 import { PromptPreview } from '@/components/core/PromptPreview'
 import { CustomPromptInput } from '@/components/core/CustomPromptInput'
@@ -15,35 +15,35 @@ import { Plus, RefreshCw, AlertCircle } from 'lucide-react'
 interface DialogState {
   isOpen: boolean
   mode: 'add' | 'edit'
-  type: 'category' | 'fragment'
-  data: Partial<Category | PromptFragment> | null
+  type: 'category' | 'section'
+  data: Partial<Category | PromptSection> | null
   categoryContext?: Category
 }
 
 interface DeleteDialogState {
   isOpen: boolean
-  type: 'category' | 'fragment'
-  item: Category | PromptFragment | null
+  type: 'category' | 'section'
+  item: Category | PromptSection | null
 }
 
 export default function Home() {
   const {
     categories,
-    fragments,
-    selectedFragmentIds,
+    sections,
+    selectedSectionIds,
     customPrompt,
     customEnabled,
     loading,
     error,
     setCategories,
-    setFragments,
-    toggleFragment,
+    setSections,
+    toggleSection,
     setCustomPrompt,
     setCustomEnabled,
     setLoading,
     setError,
     getCompiledPrompt,
-    getFragmentsByCategory,
+    getSectionsByCategory,
   } = usePromptStore()
 
   const [dialogState, setDialogState] = useState<DialogState>({
@@ -68,12 +68,12 @@ export default function Home() {
     setLoading(true)
     setError(null)
     try {
-      const [categoriesData, fragmentsData] = await Promise.all([
+      const [categoriesData, sectionsData] = await Promise.all([
         api.categories.getAll(),
-        api.fragments.getAll(),
+        api.sections.getAll(),
       ])
       setCategories(categoriesData.sort((a, b) => a.order - b.order))
-      setFragments(fragmentsData)
+      setSections(sectionsData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data')
     } finally {
@@ -108,31 +108,31 @@ export default function Home() {
     })
   }
 
-  // Fragment handlers
+  // Section handlers
   const handleAddSection = (category: Category) => {
     setDialogState({
       isOpen: true,
       mode: 'add',
-      type: 'fragment',
+      type: 'section',
       data: { categoryId: category.id },
       categoryContext: category,
     })
   }
 
-  const handleEditSection = (fragment: PromptFragment) => {
+  const handleEditSection = (section: PromptSection) => {
     setDialogState({
       isOpen: true,
       mode: 'edit',
-      type: 'fragment',
-      data: fragment,
+      type: 'section',
+      data: section,
     })
   }
 
-  const handleDeleteSection = (fragment: PromptFragment) => {
+  const handleDeleteSection = (section: PromptSection) => {
     setDeleteDialogState({
       isOpen: true,
-      type: 'fragment',
-      item: fragment,
+      type: 'section',
+      item: section,
     })
   }
 
@@ -154,15 +154,15 @@ export default function Home() {
       }
     } else {
       if (mode === 'add') {
-        const newFragment = await api.fragments.create({
+        const newSection = await api.sections.create({
           content: formData.content,
           categoryId: formData.categoryId,
-          order: fragments.filter((f) => f.categoryId === formData.categoryId).length,
+          order: sections.filter((f) => f.categoryId === formData.categoryId).length,
         })
-        setFragments([...fragments, newFragment])
+        setSections([...sections, newSection])
       } else if (data && 'id' in data) {
-        const updated = await api.fragments.update(data.id!, formData)
-        setFragments(fragments.map((f) => (f.id === updated.id ? updated : f)))
+        const updated = await api.sections.update(data.id!, formData)
+        setSections(sections.map((f) => (f.id === updated.id ? updated : f)))
       }
     }
   }
@@ -174,11 +174,11 @@ export default function Home() {
     if (type === 'category') {
       await api.categories.delete(item.id)
       setCategories(categories.filter((c) => c.id !== item.id))
-      // Remove fragments in this category
-      setFragments(fragments.filter((f) => f.categoryId !== item.id))
+      // Remove sections in this category
+      setSections(sections.filter((f) => f.categoryId !== item.id))
     } else {
-      await api.fragments.delete(item.id)
-      setFragments(fragments.filter((f) => f.id !== item.id))
+      await api.sections.delete(item.id)
+      setSections(sections.filter((f) => f.id !== item.id))
     }
   }
 
@@ -248,9 +248,9 @@ export default function Home() {
                   <CategoryList
                     key={category.id}
                     category={category}
-                    fragments={getFragmentsByCategory(category.id)}
-                    selectedFragmentIds={selectedFragmentIds}
-                    onToggleFragment={toggleFragment}
+                    sections={getSectionsByCategory(category.id)}
+                    selectedSectionIds={selectedSectionIds}
+                    onToggleSection={toggleSection}
                     onAddSection={handleAddSection}
                     onEditSection={handleEditSection}
                     onDeleteSection={handleDeleteSection}
@@ -287,7 +287,7 @@ export default function Home() {
           deleteDialogState.item
             ? 'name' in deleteDialogState.item
               ? deleteDialogState.item.name
-              : (deleteDialogState.item as PromptFragment).content.substring(0, 50) + '...'
+              : (deleteDialogState.item as PromptSection).content.substring(0, 50) + '...'
             : undefined
         }
         onClose={() => setDeleteDialogState({ ...deleteDialogState, isOpen: false })}

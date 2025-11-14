@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { PromptFragment } from '@/lib/types'
+import { PromptSection } from '@/lib/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -9,15 +9,15 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SectionItemProps {
-  fragment: PromptFragment
+  section: PromptSection
   isSelected: boolean
-  onToggle: (fragmentId: string) => void
-  onEdit: (fragment: PromptFragment) => void
-  onDelete: (fragment: PromptFragment) => void
+  onToggle: (sectionId: string) => void
+  onEdit: (section: PromptSection) => void
+  onDelete: (section: PromptSection) => void
 }
 
 export function SectionItem({
-  fragment,
+  section,
   isSelected,
   onToggle,
   onEdit,
@@ -32,18 +32,18 @@ export function SectionItem({
     >
       <div className="flex items-start gap-3 p-4">
         <Checkbox
-          id={`fragment-${fragment.id}`}
+          id={`section-${section.id}`}
           checked={isSelected}
-          onCheckedChange={() => onToggle(fragment.id)}
+          onCheckedChange={() => onToggle(section.id)}
           className="mt-1"
         />
         <div className="flex-1 min-w-0">
           <label
-            htmlFor={`fragment-${fragment.id}`}
+            htmlFor={`section-${section.id}`}
             className="cursor-pointer select-none"
           >
             <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-              {fragment.content}
+              {section.content}
             </p>
           </label>
         </div>
@@ -52,7 +52,7 @@ export function SectionItem({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => onEdit(fragment)}
+            onClick={() => onEdit(section)}
             aria-label="Edit section"
           >
             <Edit2 className="h-4 w-4" />
@@ -61,7 +61,7 @@ export function SectionItem({
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-destructive hover:text-destructive"
-            onClick={() => onDelete(fragment)}
+            onClick={() => onDelete(section)}
             aria-label="Delete section"
           >
             <Trash2 className="h-4 w-4" />

@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { PromptFragment, Category } from '@/lib/types'
+import { PromptSection, Category } from '@/lib/types'
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,8 @@ import { Loader2 } from 'lucide-react'
 interface SectionModalProps {
   isOpen: boolean
   mode: 'add' | 'edit'
-  type: 'category' | 'fragment'
-  initialData?: Partial<Category | PromptFragment> | null
+  type: 'category' | 'section'
+  initialData?: Partial<Category | PromptSection> | null
   categories?: Category[]
   onClose: () => void
   onSubmit: (data: any) => Promise<void>
@@ -47,10 +47,10 @@ export function SectionModal({
           description: categoryData?.description || '',
         })
       } else {
-        const fragmentData = initialData as Partial<PromptFragment>
+        const sectionData = initialData as Partial<PromptSection>
         setFormData({
-          content: fragmentData?.content || '',
-          categoryId: fragmentData?.categoryId || categories[0]?.id || '',
+          content: sectionData?.content || '',
+          categoryId: sectionData?.categoryId || categories[0]?.id || '',
         })
       }
     }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db, schema } from '@/db'
 import { eq } from 'drizzle-orm'
 
-// GET /api/fragments/:id - Get a specific fragment
+// GET /api/sections/:id - Get a specific section
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,7 +16,7 @@ export async function GET(
 
     if (!section) {
       return NextResponse.json(
-        { message: 'Fragment not found' },
+        { message: 'Section not found' },
         { status: 404 }
       )
     }
@@ -30,15 +30,15 @@ export async function GET(
       updatedAt: section.updatedAt,
     })
   } catch (error) {
-    console.error('Error fetching fragment:', error)
+    console.error('Error fetching section:', error)
     return NextResponse.json(
-      { message: 'Failed to fetch fragment' },
+      { message: 'Failed to fetch section' },
       { status: 500 }
     )
   }
 }
 
-// PUT /api/fragments/:id - Update a fragment
+// PUT /api/sections/:id - Update a section
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -67,7 +67,7 @@ export async function PUT(
 
     if (!section) {
       return NextResponse.json(
-        { message: 'Fragment not found' },
+        { message: 'Section not found' },
         { status: 404 }
       )
     }
@@ -81,15 +81,15 @@ export async function PUT(
       updatedAt: section.updatedAt,
     })
   } catch (error) {
-    console.error('Error updating fragment:', error)
+    console.error('Error updating section:', error)
     return NextResponse.json(
-      { message: 'Failed to update fragment' },
+      { message: 'Failed to update section' },
       { status: 500 }
     )
   }
 }
 
-// DELETE /api/fragments/:id - Delete a fragment
+// DELETE /api/sections/:id - Delete a section
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -102,9 +102,9 @@ export async function DELETE(
 
     return new NextResponse(null, { status: 204 })
   } catch (error) {
-    console.error('Error deleting fragment:', error)
+    console.error('Error deleting section:', error)
     return NextResponse.json(
-      { message: 'Failed to delete fragment' },
+      { message: 'Failed to delete section' },
       { status: 500 }
     )
   }

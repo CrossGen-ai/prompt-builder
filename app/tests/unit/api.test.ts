@@ -1,6 +1,6 @@
 import { api } from '@/lib/api'
 import { createMockFetch } from '../mocks/api.mock'
-import { mockCategories, mockFragments, createMockCategory, createMockFragment } from '../fixtures/mockData'
+import { mockCategories, mockSections, createMockCategory, createMockSection } from '../fixtures/mockData'
 
 describe('API Layer', () => {
   let mockFetch: ReturnType<typeof createMockFetch>
@@ -175,114 +175,114 @@ describe('API Layer', () => {
       })
 
       it('should handle cascade delete errors', async () => {
-        mockFetch.setupError(409, 'Cannot delete category with fragments')
+        mockFetch.setupError(409, 'Cannot delete category with sections')
 
         await expect(api.categories.delete('cat-1')).rejects.toThrow()
       })
     })
   })
 
-  describe('Fragments API', () => {
+  describe('Sections API', () => {
     describe('getAll', () => {
-      it('should fetch all fragments', async () => {
+      it('should fetch all sections', async () => {
         mockFetch.setupSuccess()
 
-        const fragments = await api.fragments.getAll()
+        const sections = await api.sections.getAll()
 
-        expect(fragments).toEqual(mockFragments)
+        expect(sections).toEqual(mockSections)
         expect(mockFetch.mock).toHaveBeenCalledWith(
-          expect.stringContaining('/fragments'),
+          expect.stringContaining('/sections'),
           expect.any(Object)
         )
       })
 
-      it('should handle empty fragments list', async () => {
+      it('should handle empty sections list', async () => {
         mockFetch.mock.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve([]),
         })
 
-        const fragments = await api.fragments.getAll()
-        expect(fragments).toEqual([])
+        const sections = await api.sections.getAll()
+        expect(sections).toEqual([])
       })
     })
 
     describe('getByCategory', () => {
-      it('should fetch fragments by category ID', async () => {
+      it('should fetch sections by category ID', async () => {
         mockFetch.setupSuccess()
 
-        const fragments = await api.fragments.getByCategory('cat-1')
+        const sections = await api.sections.getByCategory('cat-1')
 
-        expect(fragments.every(f => f.categoryId === 'cat-1')).toBe(true)
+        expect(sections.every(f => f.categoryId === 'cat-1')).toBe(true)
         expect(mockFetch.mock).toHaveBeenCalledWith(
-          expect.stringContaining('/fragments?categoryId=cat-1'),
+          expect.stringContaining('/sections?categoryId=cat-1'),
           expect.any(Object)
         )
       })
 
-      it('should return empty array for category with no fragments', async () => {
+      it('should return empty array for category with no sections', async () => {
         mockFetch.mock.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve([]),
         })
 
-        const fragments = await api.fragments.getByCategory('empty-cat')
-        expect(fragments).toEqual([])
+        const sections = await api.sections.getByCategory('empty-cat')
+        expect(sections).toEqual([])
       })
     })
 
     describe('create', () => {
-      it('should create new fragment', async () => {
+      it('should create new section', async () => {
         mockFetch.setupSuccess()
 
-        const newFragment = {
+        const newSection = {
           categoryId: 'cat-1',
-          content: 'New fragment content',
+          content: 'New section content',
           order: 1,
         }
 
-        const created = await api.fragments.create(newFragment)
+        const created = await api.sections.create(newSection)
 
         expect(created).toHaveProperty('id')
-        expect(created.content).toBe(newFragment.content)
+        expect(created.content).toBe(newSection.content)
         expect(created).toHaveProperty('createdAt')
 
         expect(mockFetch.mock).toHaveBeenCalledWith(
-          expect.stringContaining('/fragments'),
+          expect.stringContaining('/sections'),
           expect.objectContaining({
             method: 'POST',
-            body: JSON.stringify(newFragment),
+            body: JSON.stringify(newSection),
           })
         )
       })
 
-      it('should validate fragment data', async () => {
-        mockFetch.setupError(400, 'Invalid fragment data')
+      it('should validate section data', async () => {
+        mockFetch.setupError(400, 'Invalid section data')
 
         await expect(
-          api.fragments.create({ categoryId: '', content: '', order: 1 })
-        ).rejects.toThrow('Invalid fragment data')
+          api.sections.create({ categoryId: '', content: '', order: 1 })
+        ).rejects.toThrow('Invalid section data')
       })
 
       it('should validate category exists', async () => {
         mockFetch.setupError(404, 'Category not found')
 
         await expect(
-          api.fragments.create({ categoryId: 'non-existent', content: 'Test', order: 1 })
+          api.sections.create({ categoryId: 'non-existent', content: 'Test', order: 1 })
         ).rejects.toThrow('Category not found')
       })
     })
 
     describe('update', () => {
-      it('should update fragment content', async () => {
+      it('should update section content', async () => {
         mockFetch.setupSuccess()
 
         const updates = { content: 'Updated content' }
-        const updated = await api.fragments.update('frag-1', updates)
+        const updated = await api.sections.update('frag-1', updates)
 
         expect(updated.content).toBe('Updated content')
         expect(mockFetch.mock).toHaveBeenCalledWith(
-          expect.stringContaining('/fragments/frag-1'),
+          expect.stringContaining('/sections/frag-1'),
           expect.objectContaining({
             method: 'PUT',
             body: JSON.stringify(updates),
@@ -290,10 +290,10 @@ describe('API Layer', () => {
         )
       })
 
-      it('should update fragment order', async () => {
+      it('should update section order', async () => {
         mockFetch.setupSuccess()
 
-        await api.fragments.update('frag-1', { order: 5 })
+        await api.sections.update('frag-1', { order: 5 })
 
         expect(mockFetch.mock).toHaveBeenCalledWith(
           expect.anything(),
@@ -303,10 +303,10 @@ describe('API Layer', () => {
         )
       })
 
-      it('should handle moving fragment to different category', async () => {
+      it('should handle moving section to different category', async () => {
         mockFetch.setupSuccess()
 
-        await api.fragments.update('frag-1', { categoryId: 'cat-2' })
+        await api.sections.update('frag-1', { categoryId: 'cat-2' })
 
         expect(mockFetch.mock).toHaveBeenCalledWith(
           expect.anything(),
@@ -318,33 +318,33 @@ describe('API Layer', () => {
     })
 
     describe('delete', () => {
-      it('should delete fragment', async () => {
+      it('should delete section', async () => {
         mockFetch.setupSuccess()
 
-        await api.fragments.delete('frag-1')
+        await api.sections.delete('frag-1')
 
         expect(mockFetch.mock).toHaveBeenCalledWith(
-          expect.stringContaining('/fragments/frag-1'),
+          expect.stringContaining('/sections/frag-1'),
           expect.objectContaining({
             method: 'DELETE',
           })
         )
       })
 
-      it('should handle delete of non-existent fragment', async () => {
-        mockFetch.setupError(404, 'Fragment not found')
+      it('should handle delete of non-existent section', async () => {
+        mockFetch.setupError(404, 'Section not found')
 
-        await expect(api.fragments.delete('non-existent')).rejects.toThrow()
+        await expect(api.sections.delete('non-existent')).rejects.toThrow()
       })
     })
   })
 
   describe('Compile API', () => {
-    it('should compile fragments into prompt', async () => {
+    it('should compile sections into prompt', async () => {
       mockFetch.setupSuccess()
 
-      const fragmentIds = ['frag-1', 'frag-2']
-      const result = await api.compile(fragmentIds)
+      const sectionIds = ['frag-1', 'frag-2']
+      const result = await api.compile(sectionIds)
 
       expect(result).toHaveProperty('prompt')
       expect(typeof result.prompt).toBe('string')
@@ -353,7 +353,7 @@ describe('API Layer', () => {
         expect.stringContaining('/compile'),
         expect.objectContaining({
           method: 'POST',
-          body: JSON.stringify({ fragmentIds, customPrompt: undefined }),
+          body: JSON.stringify({ sectionIds, customPrompt: undefined }),
         })
       )
     })
@@ -361,10 +361,10 @@ describe('API Layer', () => {
     it('should include custom prompt in compilation', async () => {
       mockFetch.setupSuccess()
 
-      const fragmentIds = ['frag-1']
+      const sectionIds = ['frag-1']
       const customPrompt = 'Custom instruction'
 
-      await api.compile(fragmentIds, customPrompt)
+      await api.compile(sectionIds, customPrompt)
 
       expect(mockFetch.mock).toHaveBeenCalledWith(
         expect.anything(),
@@ -374,7 +374,7 @@ describe('API Layer', () => {
       )
     })
 
-    it('should handle empty fragment list', async () => {
+    it('should handle empty section list', async () => {
       mockFetch.setupSuccess()
 
       const result = await api.compile([])
@@ -383,7 +383,7 @@ describe('API Layer', () => {
     })
 
     it('should handle compile errors', async () => {
-      mockFetch.setupError(400, 'Invalid fragment IDs')
+      mockFetch.setupError(400, 'Invalid section IDs')
 
       await expect(api.compile(['invalid-id'])).rejects.toThrow()
     })
@@ -467,7 +467,7 @@ describe('API Layer', () => {
       mockFetch.setupSuccess()
 
       const longContent = 'a'.repeat(10000)
-      await api.fragments.create({
+      await api.sections.create({
         categoryId: 'cat-1',
         content: longContent,
         order: 1,
@@ -480,7 +480,7 @@ describe('API Layer', () => {
       mockFetch.setupSuccess()
 
       const specialContent = 'Test\n\nWith "quotes" and \'apostrophes\' and <tags>'
-      await api.fragments.create({
+      await api.sections.create({
         categoryId: 'cat-1',
         content: specialContent,
         order: 1,
@@ -495,7 +495,7 @@ describe('API Layer', () => {
 
       const requests = [
         api.categories.getAll(),
-        api.fragments.getAll(),
+        api.sections.getAll(),
         api.categories.getById('cat-1'),
       ]
 

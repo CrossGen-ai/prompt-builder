@@ -1,4 +1,4 @@
-import { Category, PromptFragment } from './types'
+import { Category, Section } from './types'
 import { API_BASE_URL } from './utils'
 
 class ApiError extends Error {
@@ -46,32 +46,32 @@ export const api = {
       }),
   },
 
-  // Fragments
-  fragments: {
-    getAll: () => fetchApi<PromptFragment[]>('/fragments'),
-    getById: (id: string) => fetchApi<PromptFragment>(`/fragments/${id}`),
+  // Sections
+  sections: {
+    getAll: () => fetchApi<Section[]>('/sections'),
+    getById: (id: string) => fetchApi<Section>(`/sections/${id}`),
     getByCategory: (categoryId: string) =>
-      fetchApi<PromptFragment[]>(`/fragments?categoryId=${categoryId}`),
-    create: (data: Omit<PromptFragment, 'id' | 'createdAt' | 'updatedAt'>) =>
-      fetchApi<PromptFragment>('/fragments', {
+      fetchApi<Section[]>(`/sections?categoryId=${categoryId}`),
+    create: (data: Omit<Section, 'id' | 'createdAt' | 'updatedAt'>) =>
+      fetchApi<Section>('/sections', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
-    update: (id: string, data: Partial<PromptFragment>) =>
-      fetchApi<PromptFragment>(`/fragments/${id}`, {
+    update: (id: string, data: Partial<Section>) =>
+      fetchApi<Section>(`/sections/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
       }),
     delete: (id: string) =>
-      fetchApi<void>(`/fragments/${id}`, {
+      fetchApi<void>(`/sections/${id}`, {
         method: 'DELETE',
       }),
   },
 
   // Prompt compilation
-  compile: (fragmentIds: string[], customPrompt?: string) =>
+  compile: (sectionIds: string[], customPrompt?: string) =>
     fetchApi<{ prompt: string }>('/compile', {
       method: 'POST',
-      body: JSON.stringify({ fragmentIds, customPrompt }),
+      body: JSON.stringify({ sectionIds, customPrompt }),
     }),
 }

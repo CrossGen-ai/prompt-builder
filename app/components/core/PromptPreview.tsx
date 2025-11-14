@@ -25,7 +25,7 @@ export function PromptPreview({ compiledPrompt }: PromptPreviewProps) {
     }
   }
 
-  const isEmpty = compiledPrompt.fragmentCount === 0 && !compiledPrompt.customPrompt
+  const isEmpty = compiledPrompt.sectionCount === 0 && !compiledPrompt.customPrompt
 
   return (
     <Card className="sticky top-20 h-fit">
@@ -37,7 +37,7 @@ export function PromptPreview({ compiledPrompt }: PromptPreviewProps) {
               Prompt Preview
             </CardTitle>
             <CardDescription className="mt-1">
-              {compiledPrompt.fragmentCount} section{compiledPrompt.fragmentCount !== 1 ? 's' : ''} selected
+              {compiledPrompt.sectionCount} section{compiledPrompt.sectionCount !== 1 ? 's' : ''} selected
               {compiledPrompt.customEnabled && ' + custom prompt'}
             </CardDescription>
           </div>

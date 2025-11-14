@@ -1,6 +1,6 @@
 import { api } from '@/lib/api'
 import { createMockFetch } from '../mocks/api.mock'
-import { mockCategories, mockFragments, createMockCategory, createMockFragment } from '../fixtures/mockData'
+import { mockCategories, mockSections, createMockCategory, createMockSection } from '../fixtures/mockData'
 
 describe('Database Operations Integration', () => {
   let mockFetch: ReturnType<typeof createMockFetch>
@@ -15,27 +15,27 @@ describe('Database Operations Integration', () => {
   })
 
   describe('Data Consistency', () => {
-    it('should maintain referential integrity between categories and fragments', async () => {
+    it('should maintain referential integrity between categories and sections', async () => {
       mockFetch.setupSuccess()
 
       // Get all categories
       const categories = await api.categories.getAll()
 
-      // Get all fragments
-      const fragments = await api.fragments.getAll()
+      // Get all sections
+      const sections = await api.sections.getAll()
 
-      // Verify all fragments reference valid categories
-      fragments.forEach(fragment => {
-        const categoryExists = categories.some(cat => cat.id === fragment.categoryId)
+      // Verify all sections reference valid categories
+      sections.forEach(section => {
+        const categoryExists = categories.some(cat => cat.id === section.categoryId)
         expect(categoryExists).toBe(true)
       })
     })
 
-    it('should prevent creating fragment with invalid category', async () => {
+    it('should prevent creating section with invalid category', async () => {
       mockFetch.setupError(404, 'Category not found')
 
       await expect(
-        api.fragments.create({
+        api.sections.create({
           categoryId: 'non-existent-category',
           content: 'Test content',
           order: 1,
@@ -44,11 +44,11 @@ describe('Database Operations Integration', () => {
     })
 
     it('should handle cascade delete scenarios', async () => {
-      mockFetch.setupError(409, 'Cannot delete category with fragments')
+      mockFetch.setupError(409, 'Cannot delete category with sections')
 
       await expect(
         api.categories.delete('cat-1')
-      ).rejects.toThrow('Cannot delete category with fragments')
+      ).rejects.toThrow('Cannot delete category with sections')
     })
 
     it('should update timestamps on modifications', async () => {
@@ -70,7 +70,7 @@ describe('Database Operations Integration', () => {
   })
 
   describe('Transaction Scenarios', () => {
-    it('should handle creating category and fragments atomically', async () => {
+    it('should handle creating category and sections atomically', async () => {
       mockFetch.setupSuccess()
 
       // Create category
@@ -79,22 +79,22 @@ describe('Database Operations Integration', () => {
         order: 10,
       })
 
-      // Create multiple fragments for the category
-      const fragment1 = await api.fragments.create({
+      // Create multiple sections for the category
+      const section1 = await api.sections.create({
         categoryId: newCategory.id,
-        content: 'Fragment 1',
+        content: 'Section 1',
         order: 1,
       })
 
-      const fragment2 = await api.fragments.create({
+      const section2 = await api.sections.create({
         categoryId: newCategory.id,
-        content: 'Fragment 2',
+        content: 'Section 2',
         order: 2,
       })
 
       // Verify consistency
-      expect(fragment1.categoryId).toBe(newCategory.id)
-      expect(fragment2.categoryId).toBe(newCategory.id)
+      expect(section1.categoryId).toBe(newCategory.id)
+      expect(section2.categoryId).toBe(newCategory.id)
     })
 
     it('should rollback on partial failure', async () => {
@@ -105,18 +105,18 @@ describe('Database Operations Integration', () => {
         order: 11,
       })
 
-      // First fragment succeeds
-      await api.fragments.create({
+      // First section succeeds
+      await api.sections.create({
         categoryId: newCategory.id,
-        content: 'Fragment 1',
+        content: 'Section 1',
         order: 1,
       })
 
-      // Second fragment fails
+      // Second section fails
       mockFetch.setupError(400, 'Invalid data')
 
       await expect(
-        api.fragments.create({
+        api.sections.create({
           categoryId: newCategory.id,
           content: '', // Invalid
           order: 2,
@@ -140,22 +140,22 @@ describe('Database Operations Integration', () => {
       }
     })
 
-    it('should maintain fragment order within category', async () => {
+    it('should maintain section order within category', async () => {
       mockFetch.setupSuccess()
 
-      const fragments = await api.fragments.getByCategory('cat-1')
+      const sections = await api.sections.getByCategory('cat-1')
 
-      // Verify fragments are in order
-      for (let i = 1; i < fragments.length; i++) {
-        expect(fragments[i].order).toBeGreaterThanOrEqual(fragments[i - 1].order)
+      // Verify sections are in order
+      for (let i = 1; i < sections.length; i++) {
+        expect(sections[i].order).toBeGreaterThanOrEqual(sections[i - 1].order)
       }
     })
 
-    it('should reorder fragments within category', async () => {
+    it('should reorder sections within category', async () => {
       mockFetch.setupSuccess()
 
-      // Update fragment order
-      const updated = await api.fragments.update('frag-1', { order: 10 })
+      // Update section order
+      const updated = await api.sections.update('frag-1', { order: 10 })
 
       expect(updated.order).toBe(10)
     })
@@ -163,16 +163,16 @@ describe('Database Operations Integration', () => {
     it('should handle duplicate order values', async () => {
       mockFetch.setupSuccess()
 
-      // Create two fragments with same order
-      const frag1 = await api.fragments.create({
+      // Create two sections with same order
+      const frag1 = await api.sections.create({
         categoryId: 'cat-1',
-        content: 'Fragment 1',
+        content: 'Section 1',
         order: 5,
       })
 
-      const frag2 = await api.fragments.create({
+      const frag2 = await api.sections.create({
         categoryId: 'cat-1',
-        content: 'Fragment 2',
+        content: 'Section 2',
         order: 5,
       })
 
@@ -203,17 +203,17 @@ describe('Database Operations Integration', () => {
       })
     })
 
-    it('should handle bulk fragment creation', async () => {
+    it('should handle bulk section creation', async () => {
       mockFetch.setupSuccess()
 
-      const newFragments = [
+      const newSections = [
         { categoryId: 'cat-1', content: 'Bulk 1', order: 10 },
         { categoryId: 'cat-1', content: 'Bulk 2', order: 11 },
         { categoryId: 'cat-2', content: 'Bulk 3', order: 10 },
       ]
 
       const created = await Promise.all(
-        newFragments.map(frag => api.fragments.create(frag))
+        newSections.map(frag => api.sections.create(frag))
       )
 
       expect(created).toHaveLength(3)
@@ -223,12 +223,12 @@ describe('Database Operations Integration', () => {
       mockFetch.setupSuccess()
 
       const operations = [
-        api.fragments.create({
+        api.sections.create({
           categoryId: 'cat-1',
           content: 'Valid',
           order: 1,
         }),
-        api.fragments.create({
+        api.sections.create({
           categoryId: 'cat-1',
           content: 'Valid 2',
           order: 2,
@@ -238,7 +238,7 @@ describe('Database Operations Integration', () => {
       // Add a failing operation
       mockFetch.setupError(400, 'Invalid data')
       operations.push(
-        api.fragments.create({
+        api.sections.create({
           categoryId: '',
           content: '',
           order: 3,
@@ -267,11 +267,11 @@ describe('Database Operations Integration', () => {
       expect(duration).toBeLessThan(100)
     })
 
-    it('should efficiently fetch fragments by category', async () => {
+    it('should efficiently fetch sections by category', async () => {
       mockFetch.setupSuccess()
 
       const start = performance.now()
-      await api.fragments.getByCategory('cat-1')
+      await api.sections.getByCategory('cat-1')
       const duration = performance.now() - start
 
       expect(duration).toBeLessThan(100)
@@ -284,9 +284,9 @@ describe('Database Operations Integration', () => {
 
       await Promise.all([
         api.categories.getAll(),
-        api.fragments.getAll(),
+        api.sections.getAll(),
         api.categories.getById('cat-1'),
-        api.fragments.getByCategory('cat-1'),
+        api.sections.getByCategory('cat-1'),
       ])
 
       const duration = performance.now() - start
@@ -308,11 +308,11 @@ describe('Database Operations Integration', () => {
       ).rejects.toThrow()
     })
 
-    it('should validate required fragment fields', async () => {
+    it('should validate required section fields', async () => {
       mockFetch.setupError(400, 'Content is required')
 
       await expect(
-        api.fragments.create({
+        api.sections.create({
           categoryId: 'cat-1',
           content: '',
           order: 1,
@@ -335,7 +335,7 @@ describe('Database Operations Integration', () => {
       mockFetch.setupSuccess()
 
       // Negative order should be accepted or rejected by server
-      const result = await api.fragments.create({
+      const result = await api.sections.create({
         categoryId: 'cat-1',
         content: 'Test',
         order: -1,
@@ -362,13 +362,13 @@ describe('Database Operations Integration', () => {
 
       const longContent = 'a'.repeat(100000)
 
-      const fragment = await api.fragments.create({
+      const section = await api.sections.create({
         categoryId: 'cat-1',
         content: longContent,
         order: 1,
       })
 
-      expect(fragment.content).toBe(longContent)
+      expect(section.content).toBe(longContent)
     })
 
     it('should handle special characters in names', async () => {
@@ -385,13 +385,13 @@ describe('Database Operations Integration', () => {
     it('should handle unicode characters', async () => {
       mockFetch.setupSuccess()
 
-      const fragment = await api.fragments.create({
+      const section = await api.sections.create({
         categoryId: 'cat-1',
         content: '测试 тест test 🚀',
         order: 1,
       })
 
-      expect(fragment.content).toBe('测试 тест test 🚀')
+      expect(section.content).toBe('测试 тест test 🚀')
     })
 
     it('should handle rapid successive updates', async () => {
